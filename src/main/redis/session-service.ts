@@ -316,8 +316,15 @@ export class SessionService {
   async closeSession(sessionId: string): Promise<void> {
     const session = this.getSession(sessionId);
     this.sessions.delete(sessionId);
-    await Promise.allSettled(session.tunnels.map(async (item) => await item.close()));
-    await session.client.quit().catch(async () => await session.client.disconnect());
+    
+    try {
+      await Promise.allSettled(session.tunnels.map(async (item) => await item.close()));
+      await session.client.quit().catch(async () => await session.client.disconnect());
+    } finally {
+      // 显式断开引用协助 GC
+      (session as any).client = null;
+      (session as any).tunnels = [];
+    }
   }
 
   getOpenSessions(): SessionSummary[] {

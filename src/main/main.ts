@@ -8,6 +8,11 @@ import { LogStore } from "./store/log-store";
 // 强制设置 App 名称
 app.setName("Redix");
 
+// 限制 V8 堆内存并禁用后台不必要的资源占用
+app.commandLine.appendSwitch("js-flags", "--max-old-space-size=512");
+app.commandLine.appendSwitch("disable-background-timer-throttling");
+app.commandLine.appendSwitch("disable-renderer-backgrounding");
+
 const createWindow = async (): Promise<void> => {
   const window = new BrowserWindow({
     width: 1280,

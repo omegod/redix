@@ -63,6 +63,10 @@ npm run build
 
 # 预览生产构建
 npm run preview
+
+# 打包应用
+npm run package:mac    # macOS (arm64)
+npm run package:win    # Windows (x64)
 ```
 
 ## 开发
