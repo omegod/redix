@@ -34,6 +34,14 @@ const createWindow = async (): Promise<void> => {
     window.show();
   });
 
+  // macOS 拦截关闭事件，改为隐藏窗口
+  window.on("close", (event) => {
+    if (process.platform === "darwin" && !app.isQuitting) {
+      event.preventDefault();
+      window.hide();
+    }
+  });
+
   // macOS 菜单栏特殊处理：强制显示 Redix
   if (process.platform === "darwin") {
     const template = [
@@ -118,10 +126,17 @@ app.whenReady().then(async () => {
   await createWindow();
 
   app.on("activate", async () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
+    const allWindows = BrowserWindow.getAllWindows();
+    if (allWindows.length > 0) {
+      allWindows[0].show();
+    } else {
       await createWindow();
     }
   });
+});
+
+app.on("before-quit", () => {
+  (app as any).isQuitting = true;
 });
 
 app.on("window-all-closed", () => {

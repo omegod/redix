@@ -304,7 +304,6 @@ function AppBody() {
         key: "connection-error",
         duration: 4
       });
-      // 不要 throw，因为我们已经在这里处理并展示了错误
     }
   };
 
@@ -582,7 +581,7 @@ function AppBody() {
             </div>
           ) : (
             <div className="content-stack">
-              <Card className="session-summary-card" bodyStyle={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 12px' }}>
+              <Card className="session-summary-card" bodyStyle={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 16px' }}>
                 <Space size={12} wrap className="summary-info">
                   <Tag color="blue">{activeSession.serverMode}</Tag>
                   <Text>{activeSession.endpoint}</Text>
