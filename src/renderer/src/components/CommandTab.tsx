@@ -8,6 +8,7 @@ const { Paragraph, Text } = Typography;
 interface CommandTabProps {
   state: SessionViewState;
   onExecute: (input: string) => Promise<void>;
+  onShowLogs: (input: string) => Promise<void>;
 }
 
 export const CommandTab = ({ state, onExecute }: CommandTabProps) => {
