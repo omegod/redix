@@ -67,6 +67,10 @@ export const parseInfo = (raw: string): Record<string, Record<string, string>> =
 };
 
 export const stringifyCommandResult = (result: unknown): string => {
+  if (Buffer.isBuffer(result)) {
+    return result.toString("utf8");
+  }
+
   if (typeof result === "string") {
     return result;
   }
@@ -81,7 +85,15 @@ export const stringifyCommandResult = (result: unknown): string => {
 
   return JSON.stringify(
     result,
-    (_key, value) => (typeof value === "bigint" ? value.toString() : value),
+    (_key, value) => {
+      if (typeof value === "bigint") {
+        return value.toString();
+      }
+      if (value && typeof value === "object" && value.type === "Buffer" && Array.isArray(value.data)) {
+        return Buffer.from(value.data).toString("utf8");
+      }
+      return value;
+    },
     2
   );
 };

@@ -1,12 +1,11 @@
 import {
   DeleteOutlined,
-  DownOutlined,
   EditOutlined,
   FolderOpenOutlined,
+  FolderOutlined,
   KeyOutlined,
   PlusOutlined,
   ReloadOutlined,
-  RightOutlined,
   SaveOutlined,
   SearchOutlined
 } from "@ant-design/icons";
@@ -26,6 +25,7 @@ import {
   Statistic,
   Table,
   Tag,
+  Tooltip,
   Tree,
   Typography
 } from "antd";
@@ -144,11 +144,14 @@ const treeToDataNode = (node: KeyTreeNode): TreeDataItem => ({
   fullKey: node.fullKey,
   isLeaf: node.isLeaf,
   title: (
-    <Space size={6}>
-      {node.isLeaf ? <KeyOutlined /> : <FolderOpenOutlined />}
-      <span>{node.label}</span>
-      {!node.isLeaf ? <Text type="secondary">({node.count})</Text> : null}
-    </Space>
+    <div className="tree-node-wrapper">
+      <span className="tree-node-title">{node.label}</span>
+      {!node.isLeaf ? (
+        <Text type="secondary" style={{ fontSize: 11, flexShrink: 0 }}>
+          ({node.count})
+        </Text>
+      ) : null}
+    </div>
   ),
   children: node.children.map(treeToDataNode)
 });
@@ -339,7 +342,7 @@ export const HomeTab = ({
   return (
     <div className="home-ant-layout">
       <Card className="home-sidebar-card" bodyStyle={{ padding: 12 }}>
-        <Space direction="vertical" size={12} className="sidebar-stack">
+        <div className="sidebar-stack">
           <Space.Compact className="toolbar-compact">
             <Select
               value={state.database}
@@ -350,10 +353,26 @@ export const HomeTab = ({
                 value: index
               }))}
             />
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-              新增
-            </Button>
+            <Button className="btn-add" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)} />
             <Button icon={<ReloadOutlined />} onClick={async () => await onReloadKeys()} />
+            <Button
+              className="btn-delete"
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                modal.confirm({
+                  title: `清空 DB${state.database} ?`,
+                  content: "此操作将永久删除当前数据库中的所有 Key，请谨慎操作。",
+                  okText: "确定清空",
+                  okType: "danger",
+                  cancelText: "取消",
+                  onOk: async () => {
+                    await window.api.executeCommand(session.sessionId, "FLUSHDB");
+                    await onReloadKeys();
+                    message.success(`DB${state.database} 已清空`);
+                  }
+                });
+              }}
+            />
           </Space.Compact>
 
           <Input.Search
@@ -369,8 +388,14 @@ export const HomeTab = ({
               <Empty description={state.loadingKeys ? "加载中..." : "暂无键"} />
             ) : (
               <Tree
-                showIcon={false}
-                switcherIcon={({ expanded }) => (expanded ? <DownOutlined /> : <RightOutlined />)}
+                showIcon
+                blockNode
+                expandAction="click"
+                switcherIcon={null}
+                icon={(props: any) => {
+                  if (props.isLeaf) return <KeyOutlined />;
+                  return props.expanded ? <FolderOpenOutlined /> : <FolderOutlined />;
+                }}
                 treeData={treeData}
                 selectedKeys={state.selectedKey ? [state.selectedKey] : []}
                 onSelect={async (_keys, info) => {
@@ -385,20 +410,21 @@ export const HomeTab = ({
             )}
           </div>
 
-          <Space className="sidebar-stats" split={<span>|</span>}>
-            <Text type="secondary">当前 {state.keys.length}</Text>
-            <Text type="secondary">{state.keyComplete ? "加载完成" : "可继续加载"}</Text>
-          </Space>
-
-          <Button disabled={state.keyComplete || state.loadingKeys} onClick={async () => await onLoadMoreKeys()}>
-            {state.keyComplete ? "加载完成" : "加载更多"}
-          </Button>
-        </Space>
+          <div className="sidebar-footer">
+            <Button
+              block
+              disabled={state.keyComplete || state.loadingKeys}
+              onClick={async () => await onLoadMoreKeys()}
+            >
+              {state.keyComplete ? `加载完成 (${state.keys.length})` : `加载更多 (${state.keys.length})`}
+            </Button>
+          </div>
+        </div>
       </Card>
 
       <div className="home-detail-stack">
         <Card
-          bodyStyle={{ padding: 16 }}
+          bodyStyle={{ padding: 12, overflow: "hidden" }}
           title={
             <Space size={8}>
               <EditOutlined />
@@ -406,11 +432,21 @@ export const HomeTab = ({
             </Space>
           }
           extra={
-            metadata ? <Tag color="blue">{metadata.type}</Tag> : <Tag>未选择</Tag>
+            <Space size={16}>
+              {metadata ? (
+                <Space size={12}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>Length: {metadata.length}</Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>Size: {metadata.sizeInBytes} B</Text>
+                  <Tag color="blue">{metadata.type}</Tag>
+                </Space>
+              ) : (
+                <Tag>未选择</Tag>
+              )}
+            </Space>
           }
         >
-          <Space direction="vertical" size={12} className="detail-stack">
-            <Space wrap>
+          <div className="detail-stack">
+            <Space wrap style={{ marginBottom: metadata && metadata.type !== "string" && metadata.type !== "json" ? 12 : 0 }}>
               <Input
                 value={keyName}
                 disabled={!metadata}
@@ -447,22 +483,16 @@ export const HomeTab = ({
               </Button>
             </Space>
 
-            <Space size={20}>
-              <Text type="secondary">Length: {metadata?.length ?? 0}</Text>
-              <Text type="secondary">Size: {metadata?.sizeInBytes ?? 0} B</Text>
-            </Space>
-          </Space>
-        </Card>
-
-        {metadata && metadata.type !== "string" && metadata.type !== "json" ? (
-          <Row gutter={12}>
-            <Col flex="minmax(0, 1fr)">
-              <Card title="集合数据" bodyStyle={{ padding: 0 }}>
+            {metadata && metadata.type !== "string" && metadata.type !== "json" ? (
+              <div className="detail-collection-table">
                 <Table<KeyRow>
+                  size="small"
                   rowKey="id"
                   dataSource={visibleRows}
                   columns={buildColumns(detail?.items[0])}
                   pagination={false}
+                  style={{ minHeight: 150 }}
+                  scroll={{ y: 150 }}
                   locale={{ emptyText: <Empty description="暂无数据" /> }}
                   rowSelection={{
                     type: "radio",
@@ -470,71 +500,27 @@ export const HomeTab = ({
                     onChange: (keys) => setSelectedRowId(String(keys[0] ?? ""))
                   }}
                 />
-              </Card>
-            </Col>
-            <Col flex="240px">
-              <Card title="操作">
-                <Space direction="vertical" size={12} className="sidebar-stack">
-                  <Input
-                    value={itemSearch}
-                    onChange={(event) => setItemSearch(event.target.value)}
-                    prefix={<SearchOutlined />}
-                    placeholder="筛选当前结果"
-                  />
-                  <Button icon={<ReloadOutlined />} onClick={async () => await onReloadKey()}>
-                    重新载入
-                  </Button>
-                  <Button type="primary" icon={<PlusOutlined />} onClick={() => setItemOpen(true)}>
-                    插入元素
-                  </Button>
-                  <Button
-                    danger
-                    icon={<DeleteOutlined />}
-                    disabled={!selectedRow}
-                    onClick={async () => {
-                      if (!metadata || !selectedRow) {
-                        return;
-                      }
-                      await onDeleteItem(buildDeletePayload(metadata.key, metadata.type, selectedRow));
-                      await onReloadKey(metadata.key);
-                      message.success("元素已删除");
-                    }}
-                  >
-                    删除元素
-                  </Button>
-                  <Row gutter={8}>
-                    <Col span={12}>
-                      <Statistic title="当前" value={detail?.items.length ?? 0} />
-                    </Col>
-                    <Col span={12}>
-                      <Statistic title="总数" value={detail?.total ?? 0} />
-                    </Col>
-                  </Row>
-                  <Button disabled={!detail?.hasMore || !detail.cursor} onClick={async () => {
-                    if (!metadata || !detail?.cursor) {
-                      return;
-                    }
-                    await onLoadMoreItems(metadata.key, detail.cursor);
-                  }}>
-                    {detail?.hasMore ? "加载更多" : "加载完成"}
-                  </Button>
-                </Space>
-              </Card>
-            </Col>
-          </Row>
-        ) : null}
+              </div>
+            ) : null}
+          </div>
+        </Card>
 
         <Card
           title="编辑器"
+          className="editor-card"
           extra={
             <Space size={8}>
-              <Text type="secondary">{editorAuxLabel}</Text>
-              <Input
-                value={editorAux}
-                disabled={editorAuxReadonly}
-                onChange={(event) => setEditorAux(event.target.value)}
-                className="editor-aux-input"
-              />
+              {metadata && metadata.type !== "string" && metadata.type !== "json" ? (
+                <>
+                  <Text type="secondary">{editorAuxLabel}</Text>
+                  <Input
+                    value={editorAux}
+                    disabled={editorAuxReadonly}
+                    onChange={(event) => setEditorAux(event.target.value)}
+                    className="editor-aux-input"
+                  />
+                </>
+              ) : null}
               <Tag>{metadata?.type === "json" ? "text/json" : "text/plain"}</Tag>
               <Button type="primary" icon={<SaveOutlined />} disabled={!metadata || metadata?.type === "stream"} onClick={async () => await handleSaveItem()}>
                 保存
@@ -545,7 +531,7 @@ export const HomeTab = ({
           <TextArea
             value={editorText}
             onChange={(event) => setEditorText(event.target.value)}
-            rows={16}
+            className="editor-textarea"
             placeholder="选择键或元素后可在这里编辑。"
           />
         </Card>
@@ -555,6 +541,8 @@ export const HomeTab = ({
         title="新增键"
         open={createOpen}
         onCancel={() => setCreateOpen(false)}
+        okText="保存"
+        cancelText="取消"
         onOk={async () => {
           const values = await createForm.validateFields();
           await onCreateKey(values);
@@ -564,7 +552,15 @@ export const HomeTab = ({
           message.success("键已创建");
         }}
       >
-        <Form form={createForm} layout="vertical" initialValues={{ keyType: "string", score: 0 }}>
+        <Form
+          form={createForm}
+          layout="horizontal"
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
+          labelAlign="right"
+          initialValues={{ keyType: "string", score: 0 }}
+          style={{ paddingTop: 12 }}
+        >
           <Form.Item name="key" label="键名" rules={[{ required: true, message: "请输入键名" }]}>
             <Input />
           </Form.Item>
@@ -584,7 +580,7 @@ export const HomeTab = ({
             <Input />
           </Form.Item>
           <Form.Item name="score" label="Score">
-            <InputNumber className="full-width" />
+            <InputNumber style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item name="value" label="初始值">
             <TextArea rows={4} />
@@ -596,6 +592,8 @@ export const HomeTab = ({
         title="插入元素"
         open={itemOpen}
         onCancel={() => setItemOpen(false)}
+        okText="保存"
+        cancelText="取消"
         onOk={async () => {
           if (!metadata) {
             return;
@@ -609,15 +607,22 @@ export const HomeTab = ({
           message.success("元素已插入");
         }}
       >
-        <Form form={itemForm} layout="vertical">
+        <Form
+          form={itemForm}
+          layout="horizontal"
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
+          labelAlign="right"
+          style={{ paddingTop: 12 }}
+        >
           <Form.Item name="field" label="Field">
             <Input />
           </Form.Item>
           <Form.Item name="score" label="Score">
-            <InputNumber className="full-width" />
+            <InputNumber style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="streamFields" label="Stream 字段，格式 field=value,field=value">
-            <TextArea rows={4} />
+          <Form.Item name="streamFields" label="Stream 字段">
+            <TextArea rows={4} placeholder="格式: field=value,field=value" />
           </Form.Item>
           <Form.Item name="value" label="Value">
             <TextArea rows={4} />

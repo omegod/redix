@@ -12703,18 +12703,17 @@ class FastColor {
     }
     if (!input) ;
     else if (typeof input === "string") {
-      let matchPrefix2 = function(prefix2) {
+      let matchPrefix = function(prefix2) {
         return trimStr.startsWith(prefix2);
       };
-      var matchPrefix = matchPrefix2;
       const trimStr = input.trim();
       if (/^#?[A-F\d]{3,8}$/i.test(trimStr)) {
         this.fromHexString(trimStr);
-      } else if (matchPrefix2("rgb")) {
+      } else if (matchPrefix("rgb")) {
         this.fromRgbString(trimStr);
-      } else if (matchPrefix2("hsl")) {
+      } else if (matchPrefix("hsl")) {
         this.fromHslString(trimStr);
-      } else if (matchPrefix2("hsv") || matchPrefix2("hsb")) {
+      } else if (matchPrefix("hsv") || matchPrefix("hsb")) {
         this.fromHsvString(trimStr);
       } else {
         const presetColor = presetColors[trimStr.toLowerCase()];
@@ -20853,7 +20852,7 @@ function useAlign(open, popupEle, target, placement, builtinPlacements, popupAli
   }
   const onAlign = useEvent(() => {
     if (popupEle && target && open && !mobile) {
-      let getIntersectionVisibleArea2 = function(offsetX, offsetY, area = visibleArea) {
+      let getIntersectionVisibleArea = function(offsetX, offsetY, area = visibleArea) {
         const l2 = popupRect.x + offsetX;
         const t2 = popupRect.y + offsetY;
         const r2 = l2 + popupWidth;
@@ -20863,13 +20862,12 @@ function useAlign(open, popupEle, target, placement, builtinPlacements, popupAli
         const visibleR = Math.min(r2, area.right);
         const visibleB = Math.min(b, area.bottom);
         return Math.max(0, (visibleR - visibleL) * (visibleB - visibleT));
-      }, syncNextPopupPosition2 = function() {
+      }, syncNextPopupPosition = function() {
         nextPopupY = popupRect.y + nextOffsetY;
         nextPopupBottom = nextPopupY + popupHeight;
         nextPopupX = popupRect.x + nextOffsetX;
         nextPopupRight = nextPopupX + popupWidth;
       };
-      var getIntersectionVisibleArea = getIntersectionVisibleArea2, syncNextPopupPosition = syncNextPopupPosition2;
       const popupElement = popupEle;
       const doc = popupElement.ownerDocument;
       const win = getWin(popupElement);
@@ -20995,8 +20993,8 @@ function useAlign(open, popupEle, target, placement, builtinPlacements, popupAli
       let nextPoints = [popupPoints, targetPoints];
       let nextOffsetX = targetAlignPoint.x - popupAlignPoint.x + popupOffsetX;
       let nextOffsetY = targetAlignPoint.y - popupAlignPoint.y + popupOffsetY;
-      const originIntersectionVisibleArea = getIntersectionVisibleArea2(nextOffsetX, nextOffsetY);
-      const originIntersectionRecommendArea = getIntersectionVisibleArea2(nextOffsetX, nextOffsetY, visibleRegionArea);
+      const originIntersectionVisibleArea = getIntersectionVisibleArea(nextOffsetX, nextOffsetY);
+      const originIntersectionRecommendArea = getIntersectionVisibleArea(nextOffsetX, nextOffsetY, visibleRegionArea);
       const targetAlignPointTL = getAlignPoint(targetRect, ["t", "l"]);
       const popupAlignPointTL = getAlignPoint(popupRect, ["t", "l"]);
       const targetAlignPointBR = getAlignPoint(targetRect, ["b", "r"]);
@@ -21018,7 +21016,7 @@ function useAlign(open, popupEle, target, placement, builtinPlacements, popupAli
       let nextPopupBottom;
       let nextPopupX;
       let nextPopupRight;
-      syncNextPopupPosition2();
+      syncNextPopupPosition();
       const needAdjustY = supportAdjust(adjustY);
       const sameTB = popupPoints[0] === targetPoints[0];
       if (needAdjustY && popupPoints[0] === "t" && (nextPopupBottom > adjustCheckVisibleArea.bottom || prevFlipRef.current.bt)) {
@@ -21028,8 +21026,8 @@ function useAlign(open, popupEle, target, placement, builtinPlacements, popupAli
         } else {
           tmpNextOffsetY = targetAlignPointTL.y - popupAlignPointBR.y - popupOffsetY;
         }
-        const newVisibleArea = getIntersectionVisibleArea2(nextOffsetX, tmpNextOffsetY);
-        const newVisibleRecommendArea = getIntersectionVisibleArea2(nextOffsetX, tmpNextOffsetY, visibleRegionArea);
+        const newVisibleArea = getIntersectionVisibleArea(nextOffsetX, tmpNextOffsetY);
+        const newVisibleRecommendArea = getIntersectionVisibleArea(nextOffsetX, tmpNextOffsetY, visibleRegionArea);
         if (
           // Of course use larger one
           newVisibleArea > originIntersectionVisibleArea || newVisibleArea === originIntersectionVisibleArea && (!isVisibleFirst || // Choose recommend one
@@ -21050,8 +21048,8 @@ function useAlign(open, popupEle, target, placement, builtinPlacements, popupAli
         } else {
           tmpNextOffsetY = targetAlignPointBR.y - popupAlignPointTL.y - popupOffsetY;
         }
-        const newVisibleArea = getIntersectionVisibleArea2(nextOffsetX, tmpNextOffsetY);
-        const newVisibleRecommendArea = getIntersectionVisibleArea2(nextOffsetX, tmpNextOffsetY, visibleRegionArea);
+        const newVisibleArea = getIntersectionVisibleArea(nextOffsetX, tmpNextOffsetY);
+        const newVisibleRecommendArea = getIntersectionVisibleArea(nextOffsetX, tmpNextOffsetY, visibleRegionArea);
         if (
           // Of course use larger one
           newVisibleArea > originIntersectionVisibleArea || newVisibleArea === originIntersectionVisibleArea && (!isVisibleFirst || // Choose recommend one
@@ -21074,8 +21072,8 @@ function useAlign(open, popupEle, target, placement, builtinPlacements, popupAli
         } else {
           tmpNextOffsetX = targetAlignPointTL.x - popupAlignPointBR.x - popupOffsetX;
         }
-        const newVisibleArea = getIntersectionVisibleArea2(tmpNextOffsetX, nextOffsetY);
-        const newVisibleRecommendArea = getIntersectionVisibleArea2(tmpNextOffsetX, nextOffsetY, visibleRegionArea);
+        const newVisibleArea = getIntersectionVisibleArea(tmpNextOffsetX, nextOffsetY);
+        const newVisibleRecommendArea = getIntersectionVisibleArea(tmpNextOffsetX, nextOffsetY, visibleRegionArea);
         if (
           // Of course use larger one
           newVisibleArea > originIntersectionVisibleArea || newVisibleArea === originIntersectionVisibleArea && (!isVisibleFirst || // Choose recommend one
@@ -21096,8 +21094,8 @@ function useAlign(open, popupEle, target, placement, builtinPlacements, popupAli
         } else {
           tmpNextOffsetX = targetAlignPointBR.x - popupAlignPointTL.x - popupOffsetX;
         }
-        const newVisibleArea = getIntersectionVisibleArea2(tmpNextOffsetX, nextOffsetY);
-        const newVisibleRecommendArea = getIntersectionVisibleArea2(tmpNextOffsetX, nextOffsetY, visibleRegionArea);
+        const newVisibleArea = getIntersectionVisibleArea(tmpNextOffsetX, nextOffsetY);
+        const newVisibleRecommendArea = getIntersectionVisibleArea(tmpNextOffsetX, nextOffsetY, visibleRegionArea);
         if (
           // Of course use larger one
           newVisibleArea > originIntersectionVisibleArea || newVisibleArea === originIntersectionVisibleArea && (!isVisibleFirst || // Choose recommend one
@@ -21112,7 +21110,7 @@ function useAlign(open, popupEle, target, placement, builtinPlacements, popupAli
         }
       }
       nextAlignInfo.points = [flatPoints(nextPoints[0]), flatPoints(nextPoints[1])];
-      syncNextPopupPosition2();
+      syncNextPopupPosition();
       const numShiftX = shiftX === true ? 0 : shiftX;
       if (typeof numShiftX === "number") {
         if (nextPopupX < visibleRegionArea.left) {
@@ -21236,11 +21234,10 @@ function useDelay() {
 function useWatch$1(open, target, popup, onAlign, onScroll) {
   useLayoutEffect(() => {
     if (open && target && popup) {
-      let notifyScroll2 = function() {
+      let notifyScroll = function() {
         onAlign();
         onScroll();
       };
-      var notifyScroll = notifyScroll2;
       const targetElement = target;
       const popupElement = popup;
       const targetScrollList = collectScroller(targetElement);
@@ -21248,18 +21245,18 @@ function useWatch$1(open, target, popup, onAlign, onScroll) {
       const win = getWin(popupElement);
       const mergedList = /* @__PURE__ */ new Set([win, ...targetScrollList, ...popupScrollList]);
       mergedList.forEach((scroller) => {
-        scroller.addEventListener("scroll", notifyScroll2, {
+        scroller.addEventListener("scroll", notifyScroll, {
           passive: true
         });
       });
-      win.addEventListener("resize", notifyScroll2, {
+      win.addEventListener("resize", notifyScroll, {
         passive: true
       });
       onAlign();
       return () => {
         mergedList.forEach((scroller) => {
-          scroller.removeEventListener("scroll", notifyScroll2);
-          win.removeEventListener("resize", notifyScroll2);
+          scroller.removeEventListener("scroll", notifyScroll);
+          win.removeEventListener("resize", notifyScroll);
         });
       };
     }
@@ -67103,18 +67100,17 @@ const useLazyKVMap = (data, childrenColumnName, getRowKey) => {
   const mapCacheRef = reactExports.useRef({});
   function getRecordByKey(key) {
     if (!mapCacheRef.current || mapCacheRef.current.data !== data || mapCacheRef.current.childrenColumnName !== childrenColumnName || mapCacheRef.current.getRowKey !== getRowKey) {
-      let dig2 = function(records) {
+      let dig = function(records) {
         records.forEach((record, index) => {
           const rowKey = getRowKey(record, index);
           kvMap.set(rowKey, record);
           if (record && typeof record === "object" && childrenColumnName in record) {
-            dig2(record[childrenColumnName] || []);
+            dig(record[childrenColumnName] || []);
           }
         });
       };
-      var dig = dig2;
       const kvMap = /* @__PURE__ */ new Map();
-      dig2(data);
+      dig(data);
       mapCacheRef.current = {
         data,
         childrenColumnName,
@@ -71079,18 +71075,19 @@ const CommandTab = ({ state, onExecute }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "命令" })
         ] }),
         extra: /* @__PURE__ */ jsxRuntimeExports.jsx(Text$5, { type: "secondary", children: "支持直接发送 Redis 命令并查看文本/JSON 结果。" }),
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space.Compact, { className: "command-input-compact", children: [
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "command-input-wrapper", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space.Compact, { style: { width: "100%" }, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Input,
             {
               value: command,
               onChange: (event) => setCommand(event.target.value),
               onPressEnter: async () => await submit(),
-              placeholder: '例：HGETALL user:1 或 SET foo "bar"'
+              placeholder: '例：HGETALL user:1 或 SET foo "bar"',
+              style: { flex: 1 }
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "primary", icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$1, {}), loading: busy, onClick: async () => await submit(), children: "执行" })
-        ] })
+        ] }) })
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "command-history-card", children: state.commands.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Empty, { description: "暂无执行记录" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -71099,11 +71096,11 @@ const CommandTab = ({ state, onExecute }) => {
         itemLayout: "vertical",
         dataSource: state.commands,
         renderItem: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(List.Item, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 8, wrap: true, className: "command-history-head", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 8, wrap: true, className: "command-history-head", style: { marginBottom: 8 }, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { color: "blue", children: new Date(item.createdAt).toLocaleTimeString("zh-CN") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(Text$5, { strong: true, children: item.command })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Paragraph$2, { className: "command-output", code: true, children: /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { children: item.output }) })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "command-output-simple", children: item.output })
         ] }, item.id)
       }
     ) })
@@ -71151,10 +71148,10 @@ const ConnectionManagerDialog = ({
     {
       title: "打开连接",
       open,
-      onCancel: canClose ? onClose : void 0,
-      closable: canClose,
-      maskClosable: canClose,
-      width: 980,
+      onCancel: onClose,
+      closable: true,
+      maskClosable: true,
+      width: 680,
       footer: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$8, {}), onClick: onCreate, children: "新增" }, "create"),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { disabled: !selected, onClick: () => selected && onEdit(selected), children: "编辑" }, "edit"),
@@ -71176,7 +71173,6 @@ const ConnectionManagerDialog = ({
           },
           "delete"
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { onClick: onClose, disabled: !canClose, children: "关闭" }, "close"),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Button$1,
           {
@@ -71200,12 +71196,15 @@ const ConnectionManagerDialog = ({
           "open"
         )
       ],
-      children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { direction: "vertical", size: 12, className: "modal-stack", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Paragraph$1, { type: "secondary", children: "保留原项目的启动体验：先管理连接，再打开 Redis 会话。" }),
+      children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "modal-stack", style: { display: "flex", flexDirection: "column", gap: "12px" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Paragraph$1, { type: "secondary", children: "管理并打开 Redis 会话。" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           ForwardTable,
           {
+            size: "small",
             rowKey: "id",
+            style: { minHeight: 200 },
+            scroll: { y: 200 },
             columns,
             dataSource: connections,
             pagination: false,
@@ -71272,7 +71271,8 @@ const ConnectionFormDialog = ({
       title: initialProfile.id ? "编辑连接" : "新增连接",
       open,
       onCancel: onClose,
-      width: 1080,
+      width: 720,
+      bodyStyle: { padding: "12px 0 0" },
       footer: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Button$1,
@@ -71315,52 +71315,91 @@ const ConnectionFormDialog = ({
           "save"
         )
       ],
-      children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Form, { form, layout: "vertical", className: "connection-form", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 12, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "名称", name: "title", rules: [{ required: true, message: "请输入名称" }], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "拓扑", name: "topology", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Select,
+      children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Form,
+        {
+          form,
+          layout: "horizontal",
+          className: "connection-form",
+          labelCol: { span: 8 },
+          wrapperCol: { span: 16 },
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Tabs,
             {
-              options: [
-                { label: "standalone", value: "standalone" },
-                { label: "cluster", value: "cluster" },
-                { label: "sentinel", value: "sentinel" }
+              defaultActiveKey: "basic",
+              type: "card",
+              items: [
+                {
+                  key: "basic",
+                  label: "基础配置",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { padding: "16px 24px 0" }, children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 24, children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "名称", name: "title", rules: [{ required: true, message: "请输入名称" }], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "本地开发" }) }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "拓扑", name: "topology", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Select,
+                        {
+                          options: [
+                            { label: "Standalone", value: "standalone" },
+                            { label: "Cluster", value: "cluster" },
+                            { label: "Sentinel", value: "sentinel" }
+                          ]
+                        }
+                      ) }) })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 24, children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "地址", name: "host", rules: [{ required: true, message: "Host" }], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "127.0.0.1" }) }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "端口", name: "port", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { min: 1, max: 65535, style: { width: "100%" } }) }) })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 24, children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "用户名", name: "username", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "可选" }) }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "密码", name: "password", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.Password, { placeholder: "可选" }) }) })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 24, children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "数据库", name: "database", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { min: 0, max: 15, style: { width: "100%" } }) }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "SSL", name: "ssl", valuePropName: "checked", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, { size: "small" }) }) })
+                    ] }),
+                    topology === "cluster" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "节点列表", name: "clusterNodes", labelCol: { span: 4 }, wrapperCol: { span: 20 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea$1, { rows: 3, placeholder: "10.0.0.1:6379\n10.0.0.2:6379" }) }) : null,
+                    topology === "sentinel" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Master", name: "sentinelName", labelCol: { span: 4 }, wrapperCol: { span: 20 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "mymaster" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "节点列表", name: "sentinelNodes", labelCol: { span: 4 }, wrapperCol: { span: 20 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea$1, { rows: 2, placeholder: "10.0.0.1:26379\n10.0.0.2:26379" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 24, children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "S-用户名", name: "sentinelUsername", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "S-密码", name: "sentinelPassword", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.Password, {}) }) })
+                      ] })
+                    ] }) : null
+                  ] })
+                },
+                {
+                  key: "ssh",
+                  label: "SSH 隧道",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { padding: "16px 24px 0" }, children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "启用 SSH", name: ["ssh", "enabled"], valuePropName: "checked", labelCol: { span: 4 }, wrapperCol: { span: 20 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, { size: "small" }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 24, children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "SSH 主机", name: ["ssh", "host"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { placeholder: "主机地址" }) }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "SSH 端口", name: ["ssh", "port"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { min: 1, max: 65535, style: { width: "100%" } }) }) })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 24, children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "用户名", name: ["ssh", "username"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "密码", name: ["ssh", "password"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.Password, { placeholder: "私钥模式可空" }) }) })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "私钥路径", name: ["ssh", "privateKeyPath"], labelCol: { span: 4 }, wrapperCol: { span: 20 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { addonAfter: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "link", size: "small", onClick: async () => await pickFile(["ssh", "privateKeyPath"]), children: "选择" }) }) })
+                  ] })
+                },
+                {
+                  key: "tls",
+                  label: "SSL/TLS",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { padding: "16px 24px 0" }, children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "CA 证书", name: ["tls", "caPath"], labelCol: { span: 4 }, wrapperCol: { span: 20 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { addonAfter: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "link", size: "small", onClick: async () => await pickFile(["tls", "caPath"]), children: "选择" }) }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "客户端证书", name: ["tls", "certPath"], labelCol: { span: 4 }, wrapperCol: { span: 20 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { addonAfter: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "link", size: "small", onClick: async () => await pickFile(["tls", "certPath"]), children: "选择" }) }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "客户端私钥", name: ["tls", "keyPath"], labelCol: { span: 4 }, wrapperCol: { span: 20 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { addonAfter: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "link", size: "small", onClick: async () => await pickFile(["tls", "keyPath"]), children: "选择" }) }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "私钥密码", name: ["tls", "passphrase"], labelCol: { span: 4 }, wrapperCol: { span: 20 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.Password, {}) })
+                  ] })
+                }
               ]
             }
-          ) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Host", name: "host", rules: [{ required: true, message: "请输入 Host" }], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Port", name: "port", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { min: 1, max: 65535, className: "full-width" }) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Username", name: "username", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Password", name: "password", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.Password, {}) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Database", name: "database", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { min: 0, max: 15, className: "full-width" }) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "SSL/TLS", name: "ssl", valuePropName: "checked", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, {}) }) })
-        ] }),
-        topology === "cluster" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Cluster 节点", name: "clusterNodes", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea$1, { rows: 4, placeholder: "10.0.0.1:6379\n10.0.0.2:6379" }) }) : null,
-        topology === "sentinel" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 12, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Sentinel 节点", name: "sentinelNodes", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea$1, { rows: 4, placeholder: "10.0.0.1:26379\n10.0.0.2:26379" }) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 12, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 24, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Master Name", name: "sentinelName", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Sentinel Username", name: "sentinelUsername", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Sentinel Password", name: "sentinelPassword", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.Password, {}) }) })
-          ] }) })
-        ] }) : null,
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "form-section-title", children: "TLS" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 12, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "CA", name: ["tls", "caPath"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { addonAfter: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "link", onClick: async () => await pickFile(["tls", "caPath"]), children: "选择" }) }) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Cert", name: ["tls", "certPath"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { addonAfter: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "link", onClick: async () => await pickFile(["tls", "certPath"]), children: "选择" }) }) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Key", name: ["tls", "keyPath"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { addonAfter: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "link", onClick: async () => await pickFile(["tls", "keyPath"]), children: "选择" }) }) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Passphrase", name: ["tls", "passphrase"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.Password, {}) }) })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "form-section-title", children: "SSH" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 12, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "启用 SSH", name: ["ssh", "enabled"], valuePropName: "checked", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Switch, {}) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "SSH Host", name: ["ssh", "host"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "SSH Port", name: ["ssh", "port"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { min: 1, max: 65535, className: "full-width" }) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 6, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "SSH User", name: ["ssh", "username"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "SSH Password", name: ["ssh", "password"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input.Password, {}) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { label: "Private Key", name: ["ssh", "privateKeyPath"], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { addonAfter: /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "link", onClick: async () => await pickFile(["ssh", "privateKeyPath"]), children: "选择" }) }) }) })
-        ] })
-      ] })
+          )
+        }
+      )
     }
   );
 };
@@ -71481,10 +71520,9 @@ const treeToDataNode = (node2) => ({
   key: node2.id,
   fullKey: node2.fullKey,
   isLeaf: node2.isLeaf,
-  title: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 6, children: [
-    node2.isLeaf ? /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$d, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$j, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: node2.label }),
-    !node2.isLeaf ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Text$3, { type: "secondary", children: [
+  title: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "tree-node-wrapper", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "tree-node-title", children: node2.label }),
+    !node2.isLeaf ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Text$3, { type: "secondary", style: { fontSize: 11, flexShrink: 0 }, children: [
       "(",
       node2.count,
       ")"
@@ -71654,7 +71692,7 @@ const HomeTab = ({
     message.success("元素已更新");
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "home-ant-layout", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "home-sidebar-card", bodyStyle: { padding: 12 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { direction: "vertical", size: 12, className: "sidebar-stack", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "home-sidebar-card", bodyStyle: { padding: 12 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "sidebar-stack", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(Space.Compact, { className: "toolbar-compact", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Select,
@@ -71668,8 +71706,29 @@ const HomeTab = ({
             }))
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "primary", icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$8, {}), onClick: () => setCreateOpen(true), children: "新增" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$5, {}), onClick: async () => await onReloadKeys() })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { className: "btn-add", icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$8, {}), onClick: () => setCreateOpen(true) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$5, {}), onClick: async () => await onReloadKeys() }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button$1,
+          {
+            className: "btn-delete",
+            icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$w, {}),
+            onClick: () => {
+              modal.confirm({
+                title: `清空 DB${state.database} ?`,
+                content: "此操作将永久删除当前数据库中的所有 Key，请谨慎操作。",
+                okText: "确定清空",
+                okType: "danger",
+                cancelText: "取消",
+                onOk: async () => {
+                  await window.api.executeCommand(session.sessionId, "FLUSHDB");
+                  await onReloadKeys();
+                  message.success(`DB${state.database} 已清空`);
+                }
+              });
+            }
+          }
+        )
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Input.Search,
@@ -71684,8 +71743,14 @@ const HomeTab = ({
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "tree-shell", children: treeData.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Empty, { description: state.loadingKeys ? "加载中..." : "暂无键" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
         Tree2,
         {
-          showIcon: false,
-          switcherIcon: ({ expanded }) => expanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$s, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$4, {}),
+          showIcon: true,
+          blockNode: true,
+          expandAction: "click",
+          switcherIcon: null,
+          icon: (props) => {
+            if (props.isLeaf) return /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$d, {});
+            return props.expanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$j, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$i, {});
+          },
           treeData,
           selectedKeys: state.selectedKey ? [state.selectedKey] : [],
           onSelect: async (_keys, info) => {
@@ -71696,27 +71761,39 @@ const HomeTab = ({
           }
         }
       ) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { className: "sidebar-stats", split: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "|" }), children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Text$3, { type: "secondary", children: [
-          "当前 ",
-          state.keys.length
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Text$3, { type: "secondary", children: state.keyComplete ? "加载完成" : "可继续加载" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { disabled: state.keyComplete || state.loadingKeys, onClick: async () => await onLoadMoreKeys(), children: state.keyComplete ? "加载完成" : "加载更多" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "sidebar-footer", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button$1,
+        {
+          block: true,
+          disabled: state.keyComplete || state.loadingKeys,
+          onClick: async () => await onLoadMoreKeys(),
+          children: state.keyComplete ? `加载完成 (${state.keys.length})` : `加载更多 (${state.keys.length})`
+        }
+      ) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "home-detail-stack", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Card,
         {
-          bodyStyle: { padding: 16 },
+          bodyStyle: { padding: 12, overflow: "hidden" },
           title: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 8, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$r, {}),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "键详情" })
           ] }),
-          extra: metadata ? /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { color: "blue", children: metadata.type }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { children: "未选择" }),
-          children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { direction: "vertical", size: 12, className: "detail-stack", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { wrap: true, children: [
+          extra: /* @__PURE__ */ jsxRuntimeExports.jsx(Space, { size: 16, children: metadata ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 12, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Text$3, { type: "secondary", style: { fontSize: 12 }, children: [
+              "Length: ",
+              metadata.length
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Text$3, { type: "secondary", style: { fontSize: 12 }, children: [
+              "Size: ",
+              metadata.sizeInBytes,
+              " B"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { color: "blue", children: metadata.type })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { children: "未选择" }) }),
+          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "detail-stack", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { wrap: true, style: { marginBottom: metadata && metadata.type !== "string" && metadata.type !== "json" ? 12 : 0 }, children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 Input,
                 {
@@ -71752,92 +71829,45 @@ const HomeTab = ({
               /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$5, {}), disabled: !metadata, onClick: async () => await onReloadKey(), children: "重载" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "primary", icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}), loading: saving, disabled: !metadata, onClick: async () => await handleSaveTop(), children: "更新" })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 20, children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(Text$3, { type: "secondary", children: [
-                "Length: ",
-                metadata?.length ?? 0
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(Text$3, { type: "secondary", children: [
-                "Size: ",
-                metadata?.sizeInBytes ?? 0,
-                " B"
-              ] })
-            ] })
+            metadata && metadata.type !== "string" && metadata.type !== "json" ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "detail-collection-table", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              ForwardTable,
+              {
+                size: "small",
+                rowKey: "id",
+                dataSource: visibleRows,
+                columns: buildColumns(detail?.items[0]),
+                pagination: false,
+                style: { minHeight: 150 },
+                scroll: { y: 150 },
+                locale: { emptyText: /* @__PURE__ */ jsxRuntimeExports.jsx(Empty, { description: "暂无数据" }) },
+                rowSelection: {
+                  type: "radio",
+                  selectedRowKeys: selectedRowId ? [selectedRowId] : [],
+                  onChange: (keys2) => setSelectedRowId(String(keys2[0] ?? ""))
+                }
+              }
+            ) }) : null
           ] })
         }
       ),
-      metadata && metadata.type !== "string" && metadata.type !== "json" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 12, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { flex: "minmax(0, 1fr)", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { title: "集合数据", bodyStyle: { padding: 0 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          ForwardTable,
-          {
-            rowKey: "id",
-            dataSource: visibleRows,
-            columns: buildColumns(detail?.items[0]),
-            pagination: false,
-            locale: { emptyText: /* @__PURE__ */ jsxRuntimeExports.jsx(Empty, { description: "暂无数据" }) },
-            rowSelection: {
-              type: "radio",
-              selectedRowKeys: selectedRowId ? [selectedRowId] : [],
-              onChange: (keys2) => setSelectedRowId(String(keys2[0] ?? ""))
-            }
-          }
-        ) }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { flex: "240px", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { title: "操作", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { direction: "vertical", size: 12, className: "sidebar-stack", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Input,
-            {
-              value: itemSearch,
-              onChange: (event) => setItemSearch(event.target.value),
-              prefix: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$2, {}),
-              placeholder: "筛选当前结果"
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$5, {}), onClick: async () => await onReloadKey(), children: "重新载入" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "primary", icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$8, {}), onClick: () => setItemOpen(true), children: "插入元素" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button$1,
-            {
-              danger: true,
-              icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$w, {}),
-              disabled: !selectedRow,
-              onClick: async () => {
-                if (!metadata || !selectedRow) {
-                  return;
-                }
-                await onDeleteItem(buildDeletePayload(metadata.key, metadata.type, selectedRow));
-                await onReloadKey(metadata.key);
-                message.success("元素已删除");
-              },
-              children: "删除元素"
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Row, { gutter: 8, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Statistic, { title: "当前", value: detail?.items.length ?? 0 }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Col, { span: 12, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Statistic, { title: "总数", value: detail?.total ?? 0 }) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { disabled: !detail?.hasMore || !detail.cursor, onClick: async () => {
-            if (!metadata || !detail?.cursor) {
-              return;
-            }
-            await onLoadMoreItems(metadata.key, detail.cursor);
-          }, children: detail?.hasMore ? "加载更多" : "加载完成" })
-        ] }) }) })
-      ] }) : null,
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Card,
         {
           title: "编辑器",
+          className: "editor-card",
           extra: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 8, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Text$3, { type: "secondary", children: editorAuxLabel }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Input,
-              {
-                value: editorAux,
-                disabled: editorAuxReadonly,
-                onChange: (event) => setEditorAux(event.target.value),
-                className: "editor-aux-input"
-              }
-            ),
+            metadata && metadata.type !== "string" && metadata.type !== "json" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Text$3, { type: "secondary", children: editorAuxLabel }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  value: editorAux,
+                  disabled: editorAuxReadonly,
+                  onChange: (event) => setEditorAux(event.target.value),
+                  className: "editor-aux-input"
+                }
+              )
+            ] }) : null,
             /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { children: metadata?.type === "json" ? "text/json" : "text/plain" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "primary", icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$3, {}), disabled: !metadata || metadata?.type === "stream", onClick: async () => await handleSaveItem(), children: "保存" })
           ] }),
@@ -71846,7 +71876,7 @@ const HomeTab = ({
             {
               value: editorText,
               onChange: (event) => setEditorText(event.target.value),
-              rows: 16,
+              className: "editor-textarea",
               placeholder: "选择键或元素后可在这里编辑。"
             }
           )
@@ -71859,6 +71889,8 @@ const HomeTab = ({
         title: "新增键",
         open: createOpen,
         onCancel: () => setCreateOpen(false),
+        okText: "保存",
+        cancelText: "取消",
         onOk: async () => {
           const values = await createForm.validateFields();
           await onCreateKey(values);
@@ -71867,25 +71899,37 @@ const HomeTab = ({
           createForm.resetFields();
           message.success("键已创建");
         },
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Form, { form: createForm, layout: "vertical", initialValues: { keyType: "string", score: 0 }, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "key", label: "键名", rules: [{ required: true, message: "请输入键名" }], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "keyType", label: "类型", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Select,
-            {
-              options: [
-                { label: "string", value: "string" },
-                { label: "hash", value: "hash" },
-                { label: "list", value: "list" },
-                { label: "set", value: "set" },
-                { label: "zset", value: "zset" },
-                { label: "stream", value: "stream" }
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "field", label: "Field", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "score", label: "Score", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { className: "full-width" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "value", label: "初始值", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea, { rows: 4 }) })
-        ] })
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Form,
+          {
+            form: createForm,
+            layout: "horizontal",
+            labelCol: { span: 4 },
+            wrapperCol: { span: 20 },
+            labelAlign: "right",
+            initialValues: { keyType: "string", score: 0 },
+            style: { paddingTop: 12 },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "key", label: "键名", rules: [{ required: true, message: "请输入键名" }], children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "keyType", label: "类型", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Select,
+                {
+                  options: [
+                    { label: "string", value: "string" },
+                    { label: "hash", value: "hash" },
+                    { label: "list", value: "list" },
+                    { label: "set", value: "set" },
+                    { label: "zset", value: "zset" },
+                    { label: "stream", value: "stream" }
+                  ]
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "field", label: "Field", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "score", label: "Score", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { style: { width: "100%" } }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "value", label: "初始值", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea, { rows: 4 }) })
+            ]
+          }
+        )
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -71894,6 +71938,8 @@ const HomeTab = ({
         title: "插入元素",
         open: itemOpen,
         onCancel: () => setItemOpen(false),
+        okText: "保存",
+        cancelText: "取消",
         onOk: async () => {
           if (!metadata) {
             return;
@@ -71906,12 +71952,23 @@ const HomeTab = ({
           itemForm.resetFields();
           message.success("元素已插入");
         },
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Form, { form: itemForm, layout: "vertical", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "field", label: "Field", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "score", label: "Score", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { className: "full-width" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "streamFields", label: "Stream 字段，格式 field=value,field=value", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea, { rows: 4 }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "value", label: "Value", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea, { rows: 4 }) })
-        ] })
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Form,
+          {
+            form: itemForm,
+            layout: "horizontal",
+            labelCol: { span: 4 },
+            wrapperCol: { span: 20 },
+            labelAlign: "right",
+            style: { paddingTop: 12 },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "field", label: "Field", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Input, {}) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "score", label: "Score", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TypedInputNumber, { style: { width: "100%" } }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "streamFields", label: "Stream 字段", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea, { rows: 4, placeholder: "格式: field=value,field=value" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Form.Item, { name: "value", label: "Value", children: /* @__PURE__ */ jsxRuntimeExports.jsx(TextArea, { rows: 4 }) })
+            ]
+          }
+        )
       }
     )
   ] });
@@ -71957,21 +72014,6 @@ const buildSavePayload = (key, type4, row, editorAux, editorText) => {
     keyType: "stream",
     entryId: row.rowType === "stream" ? row.entryId : void 0
   };
-};
-const buildDeletePayload = (key, type4, row) => {
-  if (type4 === "hash" && row.rowType === "hash") {
-    return { key, keyType: "hash", originalField: row.field };
-  }
-  if (type4 === "list" && row.rowType === "list") {
-    return { key, keyType: "list", index: row.index };
-  }
-  if (type4 === "set" && row.rowType === "set") {
-    return { key, keyType: "set", originalValue: row.value };
-  }
-  if (type4 === "zset" && row.rowType === "zset") {
-    return { key, keyType: "zset", originalValue: row.value };
-  }
-  return { key, keyType: "stream", entryId: row.rowType === "stream" ? row.entryId : void 0 };
 };
 const buildAddPayload = (key, type4, values) => {
   if (type4 === "hash") {
@@ -72067,6 +72109,7 @@ const LogsModal = ({ open, logs, onClose, onClear }) => {
     }
   );
 };
+const logo = "" + new URL("logo-BCW7A1ZY.png", import.meta.url).href;
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
 const createEmptyProfile = () => ({
@@ -72167,8 +72210,26 @@ function AppBody() {
   const [logsOpen, setLogsOpen] = reactExports.useState(false);
   const [logs, setLogs] = reactExports.useState([]);
   const [statusMessage, setStatusMessage] = reactExports.useState("准备就绪");
+  const isMac = navigator.userAgent.toLowerCase().includes("mac");
+  const modKey = isMac ? "⌘" : "Ctrl";
   const activeSession = sessions.find((item) => item.sessionId === activeSessionId);
   const activeView = activeSession ? views[activeSession.sessionId] : void 0;
+  reactExports.useEffect(() => {
+    const handleKeyDown = (event) => {
+      const mod = isMac ? event.metaKey : event.ctrlKey;
+      if (mod) {
+        if (event.key.toLowerCase() === "a") {
+          event.preventDefault();
+          setEditingProfile(createEmptyProfile());
+        } else if (event.key.toLowerCase() === "o") {
+          event.preventDefault();
+          setConnectionManagerOpen(true);
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMac]);
   const setView = (sessionId, updater) => {
     setViews((current) => {
       const base = current[sessionId];
@@ -72307,7 +72368,7 @@ function AppBody() {
     if (!activeSessionId || !activeView) {
       return;
     }
-    if (activeView.keys.length === 0 && !activeView.loadingKeys) {
+    if (activeView.keys.length === 0 && !activeView.loadingKeys && !activeView.keyComplete) {
       void refreshKeys(activeSessionId);
     }
   }, [activeSessionId, activeView?.keys.length, activeView?.loadingKeys]);
@@ -72351,7 +72412,7 @@ function AppBody() {
     key: session.sessionId,
     icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$x, {}),
     label: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "session-menu-label", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "session-menu-title", children: session.title }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { title: session.title, mouseEnterDelay: 0.5, placement: "right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "session-menu-title", children: session.title }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Button$1,
         {
@@ -72449,6 +72510,10 @@ function AppBody() {
         CommandTab,
         {
           state: activeView,
+          onShowLogs: async () => {
+            await loadLogs();
+            setLogsOpen(true);
+          },
           onExecute: async (input) => {
             const result = await window.api.executeCommand(activeSession.sessionId, input);
             setView(activeSession.sessionId, (current) => ({
@@ -72477,28 +72542,20 @@ function AppBody() {
     }
   ] : [];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Layout, { className: "app-layout", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Header, { className: "app-topbar", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "topbar-brand", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 10, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$x, {}),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Title, { level: 5, children: "RedisFront" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { type: "secondary", children: statusMessage })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 8, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$h, {}), onClick: async () => {
-          await loadLogs();
-          setLogsOpen(true);
-        }, children: "命令记录" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button$1, { type: "primary", icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$8, {}), onClick: () => setConnectionManagerOpen(true), children: "打开连接" })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Layout, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Sider, { width: 240, className: "session-sider", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Layout, { className: "app-body", children: [
+      sessions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Sider, { width: 240, className: "session-sider", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         Card,
         {
           title: "连接会话",
-          extra: /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { color: "orange", children: sessions.length }),
+          extra: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button$1,
+            {
+              type: "text",
+              size: "small",
+              icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$8, {}),
+              onClick: () => setConnectionManagerOpen(true)
+            }
+          ),
           bodyStyle: { padding: 8 },
           className: "session-sider-card",
           children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -72507,31 +72564,61 @@ function AppBody() {
               mode: "inline",
               selectedKeys: activeSessionId ? [activeSessionId] : [],
               items: menuItems,
-              onClick: ({ key }) => setActiveSessionId(String(key))
+              onClick: ({ key }) => setActiveSessionId(String(key)),
+              className: "session-menu"
             }
           )
         }
       ) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Content, { className: "main-content", children: !activeSession || !activeView ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "empty-card", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { direction: "vertical", size: 8, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Title, { level: 5, children: "暂无打开的连接" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { type: "secondary", children: "使用“打开连接”创建并连接 Redis。" })
-      ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { direction: "vertical", size: 12, className: "content-stack", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "session-summary-card", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 12, wrap: true, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { color: "blue", children: activeSession.serverMode }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: activeSession.endpoint }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { type: "secondary", children: [
-            "Key 数量: ",
-            activeView.metrics?.keys ?? 0
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Content, { className: "main-content", children: !activeSession || !activeView ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "empty-card", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "empty-state-content", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "empty-state-logo", children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: logo, alt: "Redix Logo" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "empty-shortcuts", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "shortcut-item", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "shortcut-label", children: "新建连接" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "shortcut-key", children: [
+              modKey,
+              "+A"
+            ] })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { type: "secondary", children: [
-            "每秒命令数: ",
-            activeView.metrics?.opsPerSec ?? 0
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { type: "secondary", children: [
-            "内存使用: ",
-            activeView.metrics?.memory ?? "-"
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "shortcut-item", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "shortcut-label", children: "打开连接" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "shortcut-key", children: [
+              modKey,
+              "+O"
+            ] })
           ] })
-        ] }) }),
+        ] })
+      ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "content-stack", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "session-summary-card", bodyStyle: { display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", padding: "0 16px" }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Space, { size: 12, wrap: true, className: "summary-info", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { color: "blue", children: activeSession.serverMode }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { children: activeSession.endpoint }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { type: "secondary", children: [
+              "Key 数量: ",
+              activeView.metrics?.keys ?? 0
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { type: "secondary", children: [
+              "每秒命令数: ",
+              activeView.metrics?.opsPerSec ?? 0
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Text, { type: "secondary", children: [
+              "内存使用: ",
+              activeView.metrics?.memory ?? "-"
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "summary-tools", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button$1,
+            {
+              size: "small",
+              icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RefIcon$h, {}),
+              onClick: async () => {
+                await loadLogs();
+                setLogsOpen(true);
+              },
+              children: "命令记录"
+            }
+          ) })
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Tabs,
           {

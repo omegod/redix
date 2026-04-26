@@ -1,4 +1,4 @@
-import { ipcMain, dialog, app, BrowserWindow } from "electron";
+import { ipcMain, dialog, app, BrowserWindow, Menu } from "electron";
 import { join, dirname } from "node:path";
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import Redis, { Command, Cluster } from "ioredis";
@@ -200,6 +200,9 @@ const parseInfo = (raw) => {
   return sections;
 };
 const stringifyCommandResult = (result) => {
+  if (Buffer.isBuffer(result)) {
+    return result.toString("utf8");
+  }
   if (typeof result === "string") {
     return result;
   }
@@ -211,7 +214,15 @@ const stringifyCommandResult = (result) => {
   }
   return JSON.stringify(
     result,
-    (_key, value) => typeof value === "bigint" ? value.toString() : value,
+    (_key, value) => {
+      if (typeof value === "bigint") {
+        return value.toString();
+      }
+      if (value && typeof value === "object" && value.type === "Buffer" && Array.isArray(value.data)) {
+        return Buffer.from(value.data).toString("utf8");
+      }
+      return value;
+    },
     2
   );
 };
@@ -916,19 +927,26 @@ class SessionService {
     });
   }
   async executeCommand(sessionId, input) {
-    return await this.withLog(sessionId, input, async () => {
-      const session = this.getSession(sessionId);
-      const args = tokenizeCommand(input);
-      if (args.length === 0) {
-        throw new Error("Command is empty");
-      }
-      const [command, ...rest] = args;
-      const result = await rawCommand(session.client, command, rest);
+    const session = this.getSession(sessionId);
+    const args = tokenizeCommand(input);
+    if (args.length === 0) {
+      throw new Error("Command is empty");
+    }
+    const [command, ...rest] = args;
+    try {
+      const result = await this.withLog(sessionId, input, async () => {
+        return await rawCommand(session.client, command, rest);
+      });
       return {
         command: input,
         output: stringifyCommandResult(result)
       };
-    });
+    } catch (error) {
+      return {
+        command: input,
+        output: `(error) ${error instanceof Error ? error.message : String(error)}`
+      };
+    }
   }
 }
 const defaultProfile = () => ({
@@ -1014,22 +1032,75 @@ class LogStore {
     this.items.length = 0;
   }
 }
+app.setName("Redix");
 const createWindow = async () => {
   const window = new BrowserWindow({
-    width: 1440,
-    height: 900,
-    minWidth: 1080,
-    minHeight: 760,
-    backgroundColor: "#3f4246",
-    title: "RedisFront",
+    width: 1280,
+    height: 720,
+    minWidth: 1024,
+    minHeight: 720,
+    backgroundColor: "#f5f7fa",
+    show: false,
+    title: "Redix",
+    icon: join(__dirname, "../../resources/icon.png"),
     autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, "../preload/index.mjs"),
       sandbox: false
     }
   });
+  window.once("ready-to-show", () => {
+    window.show();
+  });
+  if (process.platform === "darwin") {
+    const template = [
+      {
+        label: "Redix",
+        // 这里硬编码名称
+        submenu: [
+          { role: "about", label: "关于 Redix" },
+          { type: "separator" },
+          { role: "services" },
+          { type: "separator" },
+          { role: "hide", label: "隐藏 Redix" },
+          { role: "hideOthers" },
+          { role: "unhide" },
+          { type: "separator" },
+          { role: "quit", label: "退出 Redix" }
+        ]
+      },
+      {
+        label: "编辑",
+        submenu: [
+          { role: "undo", label: "撤销" },
+          { role: "redo", label: "重做" },
+          { type: "separator" },
+          { role: "cut", label: "剪切" },
+          { role: "copy", label: "复制" },
+          { role: "paste", label: "粘贴" },
+          { role: "selectAll", label: "全选" }
+        ]
+      },
+      {
+        label: "视图",
+        submenu: [
+          { role: "reload", label: "强制刷新" },
+          { role: "toggleDevTools", label: "开发者工具" },
+          { type: "separator" },
+          { role: "resetZoom", label: "实际大小" },
+          { role: "zoomIn", label: "放大" },
+          { role: "zoomOut", label: "缩小" },
+          { type: "separator" },
+          { role: "togglefullscreen", label: "全屏" }
+        ]
+      }
+    ];
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
+  }
   if (process.env["ELECTRON_RENDERER_URL"]) {
     await window.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+    window.webContents.openDevTools();
     return;
   }
   await window.loadFile(join(__dirname, "../renderer/index.html"));
@@ -1038,6 +1109,9 @@ app.whenReady().then(async () => {
   const logStore = new LogStore();
   const connectionStore = new ConnectionStore(app.getPath("userData"));
   const sessionService = new SessionService(logStore);
+  if (process.platform === "darwin") {
+    app.dock.setIcon(join(__dirname, "../../resources/icon.png"));
+  }
   registerIpc(connectionStore, sessionService, logStore);
   await createWindow();
   app.on("activate", async () => {

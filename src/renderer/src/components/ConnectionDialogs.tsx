@@ -16,6 +16,7 @@ import {
   Space,
   Switch,
   Table,
+  Tabs,
   Typography
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
@@ -92,10 +93,10 @@ export const ConnectionManagerDialog = ({
     <Modal
       title="打开连接"
       open={open}
-      onCancel={canClose ? onClose : undefined}
-      closable={canClose}
-      maskClosable={canClose}
-      width={980}
+      onCancel={onClose}
+      closable={true}
+      maskClosable={true}
+      width={680}
       footer={[
         <Button key="create" icon={<PlusOutlined />} onClick={onCreate}>
           新增
@@ -119,9 +120,6 @@ export const ConnectionManagerDialog = ({
         >
           删除
         </Button>,
-        <Button key="close" onClick={onClose} disabled={!canClose}>
-          关闭
-        </Button>,
         <Button
           key="open"
           type="primary"
@@ -144,12 +142,15 @@ export const ConnectionManagerDialog = ({
         </Button>
       ]}
     >
-      <Space direction="vertical" size={12} className="modal-stack">
+      <div className="modal-stack" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <Paragraph type="secondary">
-          保留原项目的启动体验：先管理连接，再打开 Redis 会话。
+          管理并打开 Redis 会话。
         </Paragraph>
         <Table
+          size="small"
           rowKey="id"
+          style={{ minHeight: 200 }}
+          scroll={{ y: 200 }}
           columns={columns}
           dataSource={connections}
           pagination={false}
@@ -169,8 +170,8 @@ export const ConnectionManagerDialog = ({
             }
           })}
         />
-      </Space>
-    </Modal>
+        </div>
+        </Modal>
   );
 };
 
@@ -225,7 +226,8 @@ export const ConnectionFormDialog = ({
       title={initialProfile.id ? "编辑连接" : "新增连接"}
       open={open}
       onCancel={onClose}
-      width={1080}
+      width={720}
+      bodyStyle={{ padding: "12px 0 0" }}
       footer={[
         <Button
           key="test"
@@ -267,148 +269,171 @@ export const ConnectionFormDialog = ({
         </Button>
       ]}
     >
-      <Form form={form} layout="vertical" className="connection-form">
-        <Row gutter={12}>
-          <Col span={6}>
-            <Form.Item label="名称" name="title" rules={[{ required: true, message: "请输入名称" }]}>
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="拓扑" name="topology">
-              <Select
-                options={[
-                  { label: "standalone", value: "standalone" },
-                  { label: "cluster", value: "cluster" },
-                  { label: "sentinel", value: "sentinel" }
-                ]}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="Host" name="host" rules={[{ required: true, message: "请输入 Host" }]}>
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="Port" name="port">
-              <InputNumber min={1} max={65535} className="full-width" />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="Username" name="username">
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="Password" name="password">
-              <Input.Password />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="Database" name="database">
-              <InputNumber min={0} max={15} className="full-width" />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="SSL/TLS" name="ssl" valuePropName="checked">
-              <Switch />
-            </Form.Item>
-          </Col>
-        </Row>
+      <Form
+        form={form}
+        layout="horizontal"
+        className="connection-form"
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
+      >
+        <Tabs
+          defaultActiveKey="basic"
+          type="card"
+          items={[
+            {
+              key: "basic",
+              label: "基础配置",
+              children: (
+                <div style={{ padding: "16px 24px 0" }}>
+                  <Row gutter={24}>
+                    <Col span={12}>
+                      <Form.Item label="名称" name="title" rules={[{ required: true, message: "请输入名称" }]}>
+                        <Input placeholder="本地开发" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label="拓扑" name="topology">
+                        <Select
+                          options={[
+                            { label: "Standalone", value: "standalone" },
+                            { label: "Cluster", value: "cluster" },
+                            { label: "Sentinel", value: "sentinel" }
+                          ]}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
 
-        {topology === "cluster" ? (
-          <Form.Item label="Cluster 节点" name="clusterNodes">
-            <TextArea rows={4} placeholder={"10.0.0.1:6379\n10.0.0.2:6379"} />
-          </Form.Item>
-        ) : null}
+                  <Row gutter={24}>
+                    <Col span={12}>
+                      <Form.Item label="地址" name="host" rules={[{ required: true, message: "Host" }]}>
+                        <Input placeholder="127.0.0.1" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label="端口" name="port">
+                        <InputNumber min={1} max={65535} style={{ width: "100%" }} />
+                      </Form.Item>
+                    </Col>
+                  </Row>
 
-        {topology === "sentinel" ? (
-          <Row gutter={12}>
-            <Col span={12}>
-              <Form.Item label="Sentinel 节点" name="sentinelNodes">
-                <TextArea rows={4} placeholder={"10.0.0.1:26379\n10.0.0.2:26379"} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Row gutter={12}>
-                <Col span={24}>
-                  <Form.Item label="Master Name" name="sentinelName">
-                    <Input />
+                  <Row gutter={24}>
+                    <Col span={12}>
+                      <Form.Item label="用户名" name="username">
+                        <Input placeholder="可选" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label="密码" name="password">
+                        <Input.Password placeholder="可选" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
+                  <Row gutter={24}>
+                    <Col span={12}>
+                      <Form.Item label="数据库" name="database">
+                        <InputNumber min={0} max={15} style={{ width: "100%" }} />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label="SSL" name="ssl" valuePropName="checked">
+                        <Switch size="small" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
+                  {topology === "cluster" ? (
+                    <Form.Item label="节点列表" name="clusterNodes" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                      <TextArea rows={3} placeholder={"10.0.0.1:6379\n10.0.0.2:6379"} />
+                    </Form.Item>
+                  ) : null}
+
+                  {topology === "sentinel" ? (
+                    <>
+                      <Form.Item label="Master" name="sentinelName" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                        <Input placeholder="mymaster" />
+                      </Form.Item>
+                      <Form.Item label="节点列表" name="sentinelNodes" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                        <TextArea rows={2} placeholder={"10.0.0.1:26379\n10.0.0.2:26379"} />
+                      </Form.Item>
+                      <Row gutter={24}>
+                        <Col span={12}>
+                          <Form.Item label="S-用户名" name="sentinelUsername">
+                            <Input />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item label="S-密码" name="sentinelPassword">
+                            <Input.Password />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </>
+                  ) : null}
+                </div>
+              )
+            },
+            {
+              key: "ssh",
+              label: "SSH 隧道",
+              children: (
+                <div style={{ padding: "16px 24px 0" }}>
+                  <Form.Item label="启用 SSH" name={["ssh", "enabled"]} valuePropName="checked" labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                    <Switch size="small" />
                   </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Sentinel Username" name="sentinelUsername">
-                    <Input />
+                  <Row gutter={24}>
+                    <Col span={12}>
+                      <Form.Item label="SSH 主机" name={["ssh", "host"]}>
+                        <Input placeholder="主机地址" />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label="SSH 端口" name={["ssh", "port"]}>
+                        <InputNumber min={1} max={65535} style={{ width: "100%" }} />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row gutter={24}>
+                    <Col span={12}>
+                      <Form.Item label="用户名" name={["ssh", "username"]}>
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label="密码" name={["ssh", "password"]}>
+                        <Input.Password placeholder="私钥模式可空" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Form.Item label="私钥路径" name={["ssh", "privateKeyPath"]} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                    <Input addonAfter={<Button type="link" size="small" onClick={async () => await pickFile(["ssh", "privateKeyPath"])}>选择</Button>} />
                   </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Sentinel Password" name="sentinelPassword">
+                </div>
+              )
+            },
+            {
+              key: "tls",
+              label: "SSL/TLS",
+              children: (
+                <div style={{ padding: "16px 24px 0" }}>
+                  <Form.Item label="CA 证书" name={["tls", "caPath"]} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                    <Input addonAfter={<Button type="link" size="small" onClick={async () => await pickFile(["tls", "caPath"])}>选择</Button>} />
+                  </Form.Item>
+                  <Form.Item label="客户端证书" name={["tls", "certPath"]} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                    <Input addonAfter={<Button type="link" size="small" onClick={async () => await pickFile(["tls", "certPath"])}>选择</Button>} />
+                  </Form.Item>
+                  <Form.Item label="客户端私钥" name={["tls", "keyPath"]} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+                    <Input addonAfter={<Button type="link" size="small" onClick={async () => await pickFile(["tls", "keyPath"])}>选择</Button>} />
+                  </Form.Item>
+                  <Form.Item label="私钥密码" name={["tls", "passphrase"]} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
                     <Input.Password />
                   </Form.Item>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        ) : null}
-
-        <div className="form-section-title">TLS</div>
-        <Row gutter={12}>
-          <Col span={6}>
-            <Form.Item label="CA" name={["tls", "caPath"]}>
-              <Input addonAfter={<Button type="link" onClick={async () => await pickFile(["tls", "caPath"])}>选择</Button>} />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="Cert" name={["tls", "certPath"]}>
-              <Input addonAfter={<Button type="link" onClick={async () => await pickFile(["tls", "certPath"])}>选择</Button>} />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="Key" name={["tls", "keyPath"]}>
-              <Input addonAfter={<Button type="link" onClick={async () => await pickFile(["tls", "keyPath"])}>选择</Button>} />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="Passphrase" name={["tls", "passphrase"]}>
-              <Input.Password />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <div className="form-section-title">SSH</div>
-        <Row gutter={12}>
-          <Col span={6}>
-            <Form.Item label="启用 SSH" name={["ssh", "enabled"]} valuePropName="checked">
-              <Switch />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="SSH Host" name={["ssh", "host"]}>
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="SSH Port" name={["ssh", "port"]}>
-              <InputNumber min={1} max={65535} className="full-width" />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="SSH User" name={["ssh", "username"]}>
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="SSH Password" name={["ssh", "password"]}>
-              <Input.Password />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Private Key" name={["ssh", "privateKeyPath"]}>
-              <Input addonAfter={<Button type="link" onClick={async () => await pickFile(["ssh", "privateKeyPath"])}>选择</Button>} />
-            </Form.Item>
-          </Col>
-        </Row>
+                </div>
+              )
+            }
+          ]}
+        />
       </Form>
     </Modal>
   );

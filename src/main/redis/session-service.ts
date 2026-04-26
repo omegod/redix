@@ -806,19 +806,27 @@ export class SessionService {
   }
 
   async executeCommand(sessionId: string, input: string): Promise<CommandResult> {
-    return await this.withLog(sessionId, input, async () => {
-      const session = this.getSession(sessionId);
-      const args = tokenizeCommand(input);
-      if (args.length === 0) {
-        throw new Error("Command is empty");
-      }
-      const [command, ...rest] = args;
-      const result = await rawCommand(session.client, command, rest);
+    const session = this.getSession(sessionId);
+    const args = tokenizeCommand(input);
+    if (args.length === 0) {
+      throw new Error("Command is empty");
+    }
+    const [command, ...rest] = args;
+    
+    try {
+      const result = await this.withLog(sessionId, input, async () => {
+        return await rawCommand(session.client, command, rest);
+      });
       return {
         command: input,
         output: stringifyCommandResult(result)
       };
-    });
+    } catch (error) {
+      return {
+        command: input,
+        output: `(error) ${error instanceof Error ? error.message : String(error)}`
+      };
+    }
   }
 }
 

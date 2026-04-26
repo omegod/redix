@@ -17,6 +17,7 @@ import {
   Space,
   Tabs,
   Tag,
+  Tooltip,
   Typography
 } from "antd";
 import type { MenuProps, TabsProps, ThemeConfig } from "antd";
@@ -35,6 +36,7 @@ import { HomeTab } from "./components/HomeTab";
 import { InfoTab } from "./components/InfoTab";
 import { LogsModal } from "./components/LogsModal";
 import type { SessionViewState } from "./ui-types";
+import logo from "./assets/logo.png";
 
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
@@ -142,8 +144,29 @@ function AppBody() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [statusMessage, setStatusMessage] = useState("准备就绪");
 
+  const isMac = navigator.userAgent.toLowerCase().includes("mac");
+  const modKey = isMac ? "⌘" : "Ctrl";
+
   const activeSession = sessions.find((item) => item.sessionId === activeSessionId);
   const activeView = activeSession ? views[activeSession.sessionId] : undefined;
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const mod = isMac ? event.metaKey : event.ctrlKey;
+      if (mod) {
+        if (event.key.toLowerCase() === "a") {
+          event.preventDefault();
+          setEditingProfile(createEmptyProfile());
+        } else if (event.key.toLowerCase() === "o") {
+          event.preventDefault();
+          setConnectionManagerOpen(true);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMac]);
 
   const setView = (sessionId: string, updater: (current: SessionViewState) => SessionViewState) => {
     setViews((current) => {
@@ -311,7 +334,7 @@ function AppBody() {
     if (!activeSessionId || !activeView) {
       return;
     }
-    if (activeView.keys.length === 0 && !activeView.loadingKeys) {
+    if (activeView.keys.length === 0 && !activeView.loadingKeys && !activeView.keyComplete) {
       void refreshKeys(activeSessionId);
     }
   }, [activeSessionId, activeView?.keys.length, activeView?.loadingKeys]);
@@ -362,7 +385,9 @@ function AppBody() {
     icon: <DatabaseOutlined />,
     label: (
       <div className="session-menu-label">
-        <span className="session-menu-title">{session.title}</span>
+        <Tooltip title={session.title} mouseEnterDelay={0.5} placement="right">
+          <span className="session-menu-title">{session.title}</span>
+        </Tooltip>
         <Button
           type="text"
           size="small"
@@ -375,7 +400,6 @@ function AppBody() {
       </div>
     )
   }));
-
   const tabItems: TabsProps["items"] = activeSession && activeView
     ? [
         {
@@ -464,6 +488,10 @@ function AppBody() {
           children: (
             <CommandTab
               state={activeView}
+              onShowLogs={async () => {
+                await loadLogs();
+                setLogsOpen(true);
+              }}
               onExecute={async (input) => {
                 const result = await window.api.executeCommand(activeSession.sessionId, input);
                 setView(activeSession.sessionId, (current) => ({
@@ -497,62 +525,74 @@ function AppBody() {
 
   return (
     <Layout className="app-layout">
-      <Header className="app-topbar">
-        <div className="topbar-brand">
-          <Space size={10}>
-            <DatabaseOutlined />
-            <Title level={5}>RedisFront</Title>
-          </Space>
-          <Text type="secondary">{statusMessage}</Text>
-        </div>
-        <Space size={8}>
-          <Button icon={<HistoryOutlined />} onClick={async () => {
-            await loadLogs();
-            setLogsOpen(true);
-          }}>
-            命令记录
-          </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setConnectionManagerOpen(true)}>
-            打开连接
-          </Button>
-        </Space>
-      </Header>
-
-      <Layout>
-        <Sider width={240} className="session-sider">
-          <Card
-            title="连接会话"
-            extra={<Tag color="orange">{sessions.length}</Tag>}
-            bodyStyle={{ padding: 8 }}
-            className="session-sider-card"
-          >
-            <Menu
-              mode="inline"
-              selectedKeys={activeSessionId ? [activeSessionId] : []}
-              items={menuItems}
-              onClick={({ key }) => setActiveSessionId(String(key))}
-            />
-          </Card>
-        </Sider>
+      <Layout className="app-body">
+        {sessions.length > 0 && (
+          <Sider width={240} className="session-sider">
+            <Card
+              title="连接会话"
+              extra={
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => setConnectionManagerOpen(true)}
+                />
+              }
+              bodyStyle={{ padding: 8 }}
+              className="session-sider-card"
+            >
+              <Menu
+                mode="inline"
+                selectedKeys={activeSessionId ? [activeSessionId] : []}
+                items={menuItems}
+                onClick={({ key }) => setActiveSessionId(String(key))}
+                className="session-menu"
+              />
+            </Card>
+          </Sider>
+        )}
 
         <Content className="main-content">
           {!activeSession || !activeView ? (
-            <Card className="empty-card">
-              <Space direction="vertical" size={8}>
-                <Title level={5}>暂无打开的连接</Title>
-                <Text type="secondary">使用“打开连接”创建并连接 Redis。</Text>
-              </Space>
-            </Card>
+            <div className="empty-card">
+              <div className="empty-state-content">
+                <div className="empty-state-logo">
+                  <img src={logo} alt="Redix Logo" />
+                </div>
+                <div className="empty-shortcuts">
+                  <div className="shortcut-item">
+                    <span className="shortcut-label">新建连接</span>
+                    <span className="shortcut-key">{modKey}+A</span>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-label">打开连接</span>
+                    <span className="shortcut-key">{modKey}+O</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           ) : (
-            <Space direction="vertical" size={12} className="content-stack">
-              <Card className="session-summary-card">
-                <Space size={12} wrap>
+            <div className="content-stack">
+              <Card className="session-summary-card" bodyStyle={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 16px' }}>
+                <Space size={12} wrap className="summary-info">
                   <Tag color="blue">{activeSession.serverMode}</Tag>
                   <Text>{activeSession.endpoint}</Text>
                   <Text type="secondary">Key 数量: {activeView.metrics?.keys ?? 0}</Text>
                   <Text type="secondary">每秒命令数: {activeView.metrics?.opsPerSec ?? 0}</Text>
                   <Text type="secondary">内存使用: {activeView.metrics?.memory ?? "-"}</Text>
                 </Space>
+                <div className="summary-tools">
+                  <Button
+                    size="small"
+                    icon={<HistoryOutlined />}
+                    onClick={async () => {
+                      await loadLogs();
+                      setLogsOpen(true);
+                    }}
+                  >
+                    命令记录
+                  </Button>
+                </div>
               </Card>
 
               <Tabs
@@ -565,7 +605,7 @@ function AppBody() {
                   }))
                 }
               />
-            </Space>
+            </div>
           )}
         </Content>
       </Layout>
