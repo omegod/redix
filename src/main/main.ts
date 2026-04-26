@@ -33,7 +33,7 @@ const createWindow = async (): Promise<void> => {
   if (process.platform === "darwin") {
     const template = [
       {
-        label: "Redix", // 这里硬编码名称
+        label: "Redix",
         submenu: [
           { role: "about", label: "关于 Redix" },
           { type: "separator" },
@@ -47,15 +47,31 @@ const createWindow = async (): Promise<void> => {
         ]
       },
       {
-        label: "编辑",
+        label: "设置",
         submenu: [
-          { role: "undo", label: "撤销" },
-          { role: "redo", label: "重做" },
-          { type: "separator" },
-          { role: "cut", label: "剪切" },
-          { role: "copy", label: "复制" },
-          { role: "paste", label: "粘贴" },
-          { role: "selectAll", label: "全选" }
+          {
+            label: "外观主题",
+            submenu: [
+              {
+                label: "亮色",
+                type: "radio",
+                checked: true,
+                click: () => window.webContents.send("theme:change", "light")
+              },
+              {
+                label: "暗色",
+                type: "radio",
+                checked: false,
+                click: () => window.webContents.send("theme:change", "dark")
+              },
+              {
+                label: "跟随系统",
+                type: "radio",
+                checked: false,
+                click: () => window.webContents.send("theme:change", "system")
+              }
+            ]
+          }
         ]
       },
       {

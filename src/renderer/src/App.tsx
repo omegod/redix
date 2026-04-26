@@ -18,7 +18,8 @@ import {
   Tabs,
   Tag,
   Tooltip,
-  Typography
+  Typography,
+  theme
 } from "antd";
 import zhCN from "antd/locale/zh_CN";
 import type { MenuProps, TabsProps, ThemeConfig } from "antd";
@@ -88,12 +89,13 @@ const createSessionState = (session: SessionSummary): SessionViewState => ({
 
 const makeId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
-const themeConfig: ThemeConfig = {
+const themeConfig = (isDark: boolean): ThemeConfig => ({
+  algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
   token: {
     colorPrimary: "#d84a1b",
-    colorBgLayout: "#f5f7fa",
-    colorBgContainer: "#ffffff",
-    colorBorderSecondary: "#e8edf3",
+    colorBgLayout: isDark ? "#141414" : "#f5f7fa",
+    colorBgContainer: isDark ? "#1f1f1f" : "#ffffff",
+    colorBorderSecondary: isDark ? "#303030" : "#e8edf3",
     borderRadius: 10,
     fontSize: 14
   },
@@ -132,7 +134,7 @@ const themeConfig: ThemeConfig = {
       titleMarginTop: 0
     }
   }
-};
+});
 
 function AppBody() {
   const { message, modal, notification } = AntApp.useApp();
@@ -580,7 +582,7 @@ function AppBody() {
             </div>
           ) : (
             <div className="content-stack">
-              <Card className="session-summary-card" bodyStyle={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 16px' }}>
+              <Card className="session-summary-card" bodyStyle={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 12px' }}>
                 <Space size={12} wrap className="summary-info">
                   <Tag color="blue">{activeSession.serverMode}</Tag>
                   <Text>{activeSession.endpoint}</Text>
@@ -649,8 +651,38 @@ function AppBody() {
 }
 
 export default function App() {
+  const [themeMode, setThemeMode] = useState<"light" | "dark" | "system">("light");
+  const [systemIsDark, setSystemIsDark] = useState(window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  useEffect(() => {
+    // 监听主进程发来的主题变更指令
+    window.api.onThemeChange((mode) => {
+      setThemeMode(mode);
+    });
+
+    // 监听系统主题变化
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e: MediaQueryListEvent) => setSystemIsDark(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
+  const isDark = useMemo(() => {
+    if (themeMode === "system") return systemIsDark;
+    return themeMode === "dark";
+  }, [themeMode, systemIsDark]);
+
+  useEffect(() => {
+    // 在 HTML 标签上设置类名，方便 CSS 变量切换
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDark]);
+
   return (
-    <ConfigProvider theme={themeConfig} locale={zhCN}>
+    <ConfigProvider theme={themeConfig(isDark)} locale={zhCN}>
       <AntApp>
         <AppBody />
       </AntApp>

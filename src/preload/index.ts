@@ -59,7 +59,9 @@ const api = {
   executeCommand: async (sessionId: string, input: string): Promise<CommandResult> =>
     await ipcRenderer.invoke("redis:execute", sessionId, input),
   listLogs: async (): Promise<LogEntry[]> => await ipcRenderer.invoke("logs:list"),
-  clearLogs: async (): Promise<void> => await ipcRenderer.invoke("logs:clear")
+  clearLogs: async (): Promise<void> => await ipcRenderer.invoke("logs:clear"),
+  onThemeChange: (callback: (mode: "light" | "dark" | "system") => void) =>
+    ipcRenderer.on("theme:change", (_event, mode) => callback(mode))
 };
 
 contextBridge.exposeInMainWorld("api", api);

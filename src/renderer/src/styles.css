@@ -7,6 +7,21 @@
   --border: #e8edf3;
   --text: #213547;
   --muted: #6b7785;
+  --terminal-bg: #f8f9fa;
+  --terminal-text: #213547;
+  --session-active-bg: #fdf2f0;
+}
+
+/* 暗色主题变量 */
+html.dark {
+  --bg-layout: #141414;
+  --bg-panel: #1f1f1f;
+  --border: #303030;
+  --text: #e0e0e0;
+  --muted: #8c8c8c;
+  --terminal-bg: #1a1a1a;
+  --terminal-text: #d0d0d0;
+  --session-active-bg: #2a1210;
 }
 
 * {
@@ -80,6 +95,7 @@ body {
 .empty-card {
   border-color: var(--border);
   box-shadow: none;
+  background-color: var(--bg-panel);
 }
 
 .ant-card-body {
@@ -105,11 +121,18 @@ body {
   padding: 0 12px !important;
   display: flex !important;
   align-items: center !important;
+  border-bottom: 1px solid var(--border) !important;
 }
 
 .ant-card-head-title {
   padding: 0 !important;
   font-size: var(--font-14) !important;
+}
+
+.ant-card-extra {
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .session-summary-card {
@@ -118,7 +141,7 @@ body {
 }
 
 .session-summary-card .ant-card-body {
-  padding: 0 16px !important;
+  padding: 0 12px !important;
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
@@ -146,14 +169,15 @@ body {
   transition: all 0.2s;
   user-select: none;
   gap: 10px;
+  color: var(--text);
 }
 
 .session-item:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(128, 128, 128, 0.1);
 }
 
 .session-item.active {
-  background: #fdf2f0;
+  background: var(--session-active-bg);
   color: #d84a1b;
 }
 
@@ -202,7 +226,7 @@ body {
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  gap: 12px;
+  gap: 0px;
   height: 100%;
   overflow: hidden;
 }
@@ -248,6 +272,12 @@ body {
   justify-content: center;
   align-items: center;
   mix-blend-mode: multiply;
+}
+
+html.dark .empty-state-logo {
+  mix-blend-mode: normal; /* 暗色模式下由于背景不是纯白，正片叠底会变黑，所以恢复正常 */
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
 }
 
 .empty-state-logo img {
@@ -323,6 +353,8 @@ body {
   padding: 8px;
   font-family: "JetBrains Mono", monospace;
   font-size: 13px;
+  background: var(--bg-panel);
+  color: var(--text);
 }
 
 .toolbar-compact {
@@ -335,7 +367,7 @@ body {
 
 .toolbar-compact .ant-select .ant-select-selector,
 .toolbar-compact .ant-btn {
-  border-color: #d9d9d9 !important;
+  border-color: var(--border) !important;
   transition: all 0.2s;
   position: relative;
 }
@@ -362,7 +394,7 @@ body {
   padding: 4px;
   overflow-y: auto;
   overflow-x: hidden;
-  background: #ffffff;
+  background: var(--bg-panel);
 }
 
 .ant-tree-list-holder {
@@ -456,14 +488,14 @@ body {
   gap: 12px;
   min-height: 0;
   height: 100%;
-  padding-top: 12px;
+  padding-top: 0px;
   overflow: hidden;
 }
 
 .ant-table.ant-table-small .ant-table-thead > tr > th {
-  background: #fbfcfe;
+  background: var(--bg-layout);
   padding: 8px 12px !important;
-  border-bottom: 1px solid #f0f0f0 !important;
+  border-bottom: 1px solid var(--border) !important;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -476,8 +508,8 @@ body {
 .command-output-simple {
   margin: 0;
   display: block;
-  background: #f8f9fa;
-  border: 1px solid #e8edf3;
+  background: var(--terminal-bg);
+  border: 1px solid var(--border);
   padding: 8px 12px;
   border-radius: 4px;
   white-space: pre-wrap;
@@ -485,7 +517,7 @@ body {
   font-size: 12px;
   line-height: 1.6;
   font-family: "JetBrains Mono", monospace;
-  color: #213547;
+  color: var(--terminal-text);
 }
 
 .command-history-card,
