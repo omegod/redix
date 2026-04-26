@@ -17,7 +17,8 @@ html,
 body,
 #root {
   margin: 0;
-  min-height: 100%;
+  height: 100vh;
+  overflow: hidden;
   background: var(--bg-layout);
 }
 
@@ -38,6 +39,7 @@ body {
   background: var(--bg-layout);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .app-body.ant-layout {
@@ -45,7 +47,9 @@ body {
   display: flex;
   flex-direction: row;
   min-height: 0;
+  height: 100%;
   background: var(--bg-layout);
+  overflow: hidden;
 }
 
 .app-body .session-sider.ant-layout-sider {
@@ -78,7 +82,6 @@ body {
   box-shadow: none;
 }
 
-/* 统一内边距 */
 .ant-card-body {
   padding: 12px !important;
 }
@@ -96,7 +99,6 @@ body {
   min-height: 0;
 }
 
-/* 统一头部 */
 .ant-card-head {
   min-height: 48px !important;
   height: 48px !important;
@@ -110,14 +112,9 @@ body {
   font-size: var(--font-14) !important;
 }
 
-.ant-card-extra {
-  padding: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
 .session-summary-card {
   min-height: 48px;
+  flex-shrink: 0;
 }
 
 .session-summary-card .ant-card-body {
@@ -134,28 +131,6 @@ body {
   flex-shrink: 0;
 }
 
-.session-menu.ant-menu {
-  border-inline-end: none !important;
-}
-
-.session-menu.ant-menu .ant-menu-item {
-  padding-inline: 12px !important;
-}
-
-.session-menu-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-}
-
-.session-menu-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .main-content {
   display: flex;
   flex-direction: column;
@@ -166,27 +141,30 @@ body {
   overflow: hidden;
 }
 
-.content-stack, .page-panel {
+.content-stack {
   display: flex;
   flex: 1;
   flex-direction: column;
   min-height: 0;
   gap: 12px;
   height: 100%;
+  overflow: hidden;
 }
 
 .sidebar-stack {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  height: 100%;
   min-height: 0;
   gap: 12px;
+  overflow: hidden;
 }
 
 .sidebar-footer {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .empty-card {
@@ -229,16 +207,23 @@ body {
   flex: 1;
   min-height: 0;
   height: 100%;
+  overflow: hidden;
 }
 
 .home-sidebar-card {
   height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .home-sidebar-card .ant-card-body {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .home-detail-stack {
@@ -248,6 +233,7 @@ body {
   flex: 1;
   min-height: 0;
   height: 100%;
+  overflow: hidden;
 }
 
 .detail-collection-table {
@@ -259,15 +245,12 @@ body {
   border-radius: 0 !important;
 }
 
-.detail-collection-table .ant-table.ant-table-small .ant-table-thead > tr > th {
-  border-bottom: 1px solid var(--border) !important;
-}
-
 .editor-card {
   flex: 1.5;
   display: flex;
   flex-direction: column;
   min-height: 200px;
+  overflow: hidden;
 }
 
 .editor-card .ant-card-body {
@@ -288,6 +271,7 @@ body {
 
 .toolbar-compact {
   width: 100%;
+  flex-shrink: 0;
 }
 
 .toolbar-compact .ant-select { flex: 3; }
@@ -314,52 +298,19 @@ body {
   z-index: 11 !important;
 }
 
-.toolbar-compact .btn-add {
-  color: #333 !important;
-  background: #fff !important;
-}
-
-.toolbar-compact .btn-add:hover {
-  color: #d84a1b !important;
-}
-
-.toolbar-compact .btn-delete {
-  color: #ff4d4f !important;
-}
-
-.toolbar-compact .btn-delete:hover {
-  color: #ff4d4f !important;
-}
-
-.toolbar-compact .ant-btn:active .anticon {
-  color: #fff !important;
-}
-
 .tree-shell {
   flex: 1;
   min-height: 0;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 4px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: #ffffff;
 }
 
-.tree-node-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-  min-width: 0;
-}
-
-.tree-node-wrapper {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  overflow: hidden;
-  gap: 6px;
-  min-width: 0;
+.ant-tree-list-holder {
+  padding-bottom: 8px;
 }
 
 .ant-tree-switcher,
@@ -386,7 +337,8 @@ body {
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  display: block;
+  display: flex !important;
+  align-items: center;
 }
 
 .ant-tree-iconEle {
@@ -394,19 +346,62 @@ body {
   align-items: center;
   justify-content: center;
   margin-inline-end: 4px;
+  flex-shrink: 0;
 }
 
 .ant-tree-treenode {
   width: 100%;
   overflow: hidden;
+  display: flex !important;
+  align-items: center;
 }
 
-.ant-tree-list-holder-inner {
+.tree-node-wrapper {
+  display: flex;
+  align-items: center;
   width: 100%;
+  overflow: hidden;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
 }
 
-.ant-statistic .ant-statistic-content {
-  line-height: 1.2;
+.tree-node-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: 0;
+  flex: 1;
+}
+
+.ant-tabs {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ant-tabs-content, .ant-tabs-content-holder, .ant-tabs-tabpane {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  height: 100%;
+  padding-top: 12px;
+  overflow: hidden;
 }
 
 .ant-table.ant-table-small .ant-table-thead > tr > th {
@@ -416,6 +411,10 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.ant-table-body {
+  overflow-y: auto !important;
 }
 
 .command-output-simple {
@@ -436,37 +435,17 @@ body {
 .command-history-card,
 .info-sections-card {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
 .command-history-card .ant-card-body,
 .info-sections-card .ant-card-body {
-  height: 100%;
+  flex: 1;
   overflow: auto;
-}
-
-.ant-tabs, .ant-tabs-content, .ant-tabs-content-holder {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
   min-height: 0;
-}
-
-.ant-tabs-tabpane {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.page-panel {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 12px;
-  min-height: 0;
-  height: 100%;
-  padding-top: 12px;
 }
 
 @media (max-width: 1080px) {

@@ -20,6 +20,7 @@ import {
   Tooltip,
   Typography
 } from "antd";
+import zhCN from "antd/locale/zh_CN";
 import type { MenuProps, TabsProps, ThemeConfig } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import type {
@@ -134,6 +135,7 @@ const themeConfig: ThemeConfig = {
 };
 
 function AppBody() {
+  const { message, modal, notification } = AntApp.useApp();
   const [connections, setConnections] = useState<ConnectionProfile[]>([]);
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [views, setViews] = useState<Record<string, SessionViewState>>({});
@@ -291,8 +293,16 @@ function AppBody() {
       setActiveSessionId(session.sessionId);
       setConnectionManagerOpen(false);
       setStatusMessage(`已连接 ${session.endpoint}`);
-    } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : String(error));
+      message.success("连接成功");
+    } catch (error: any) {
+      const msg = error?.message || String(error);
+      setStatusMessage(`错误: ${msg}`);
+      message.error({
+        content: `连接失败: ${msg}`,
+        key: "connection-error",
+        duration: 4
+      });
+      // 不要 throw，因为我们已经在这里处理并展示了错误
     }
   };
 
@@ -643,7 +653,7 @@ function AppBody() {
 
 export default function App() {
   return (
-    <ConfigProvider theme={themeConfig}>
+    <ConfigProvider theme={themeConfig} locale={zhCN}>
       <AntApp>
         <AppBody />
       </AntApp>

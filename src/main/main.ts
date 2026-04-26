@@ -12,7 +12,7 @@ const createWindow = async (): Promise<void> => {
   const window = new BrowserWindow({
     width: 1280,
     height: 720,
-    minWidth: 1024,
+    minWidth: 1080,
     minHeight: 720,
     backgroundColor: "#f5f7fa",
     show: false,
@@ -61,9 +61,6 @@ const createWindow = async (): Promise<void> => {
       {
         label: "视图",
         submenu: [
-          { role: "reload", label: "强制刷新" },
-          { role: "toggleDevTools", label: "开发者工具" },
-          { type: "separator" },
           { role: "resetZoom", label: "实际大小" },
           { role: "zoomIn", label: "放大" },
           { role: "zoomOut", label: "缩小" },

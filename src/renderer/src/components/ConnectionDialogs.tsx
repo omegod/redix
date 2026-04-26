@@ -62,7 +62,7 @@ export const ConnectionManagerDialog = ({
   onEdit,
   onDelete
 }: ConnectionManagerProps) => {
-  const { modal } = App.useApp();
+  const { modal, message } = App.useApp();
   const [selectedId, setSelectedId] = useState<string>("");
   const [busyId, setBusyId] = useState<string>("");
 

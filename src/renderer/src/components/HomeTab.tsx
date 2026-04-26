@@ -427,7 +427,6 @@ export const HomeTab = ({
           bodyStyle={{ padding: 12, overflow: "hidden" }}
           title={
             <Space size={8}>
-              <EditOutlined />
               <span>键详情</span>
             </Space>
           }
@@ -491,9 +490,8 @@ export const HomeTab = ({
                   dataSource={visibleRows}
                   columns={buildColumns(detail?.items[0])}
                   pagination={false}
-                  style={{ minHeight: 150 }}
-                  scroll={{ y: 150 }}
-                  locale={{ emptyText: <Empty description="暂无数据" /> }}
+                  style={{ minHeight: 130 }}
+                  scroll={{ y: 130 }}
                   rowSelection={{
                     type: "radio",
                     selectedRowKeys: selectedRowId ? [selectedRowId] : [],
@@ -541,8 +539,6 @@ export const HomeTab = ({
         title="新增键"
         open={createOpen}
         onCancel={() => setCreateOpen(false)}
-        okText="保存"
-        cancelText="取消"
         onOk={async () => {
           const values = await createForm.validateFields();
           await onCreateKey(values);
@@ -592,8 +588,6 @@ export const HomeTab = ({
         title="插入元素"
         open={itemOpen}
         onCancel={() => setItemOpen(false)}
-        okText="保存"
-        cancelText="取消"
         onOk={async () => {
           if (!metadata) {
             return;
