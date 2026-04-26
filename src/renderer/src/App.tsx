@@ -150,6 +150,7 @@ function AppBody() {
 
   const isMac = navigator.userAgent.toLowerCase().includes("mac");
   const modKey = isMac ? "⌘" : "Ctrl";
+  const shiftKey = isMac ? "⇧" : "Shift";
 
   const activeSession = sessions.find((item) => item.sessionId === activeSessionId);
   const activeView = activeSession ? views[activeSession.sessionId] : undefined;
@@ -157,7 +158,9 @@ function AppBody() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const mod = isMac ? event.metaKey : event.ctrlKey;
-      if (mod) {
+      const shift = event.shiftKey;
+
+      if (mod && shift) {
         if (event.key.toLowerCase() === "a") {
           event.preventDefault();
           setEditingProfile(createEmptyProfile());
@@ -570,11 +573,11 @@ function AppBody() {
                 <div className="empty-shortcuts">
                   <div className="shortcut-item">
                     <span className="shortcut-label">新建连接</span>
-                    <span className="shortcut-key">{modKey}+A</span>
+                    <span className="shortcut-key">{modKey}+{shiftKey}+A</span>
                   </div>
                   <div className="shortcut-item">
                     <span className="shortcut-label">打开连接</span>
-                    <span className="shortcut-key">{modKey}+O</span>
+                    <span className="shortcut-key">{modKey}+{shiftKey}+O</span>
                   </div>
                 </div>
               </div>
