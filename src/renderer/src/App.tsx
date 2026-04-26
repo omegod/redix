@@ -390,26 +390,6 @@ function AppBody() {
     await loadConnections();
   };
 
-  const menuItems: MenuProps["items"] = sessions.map((session) => ({
-    key: session.sessionId,
-    icon: <DatabaseOutlined />,
-    label: (
-      <div className="session-menu-label">
-        <Tooltip title={session.title} mouseEnterDelay={0.5} placement="right">
-          <span className="session-menu-title">{session.title}</span>
-        </Tooltip>
-        <Button
-          type="text"
-          size="small"
-          icon={<DisconnectOutlined />}
-          onClick={async (event) => {
-            event.stopPropagation();
-            await handleCloseSession(session.sessionId);
-          }}
-        />
-      </div>
-    )
-  }));
   const tabItems: TabsProps["items"] = activeSession && activeView
     ? [
         {
@@ -551,13 +531,30 @@ function AppBody() {
               bodyStyle={{ padding: 8 }}
               className="session-sider-card"
             >
-              <Menu
-                mode="inline"
-                selectedKeys={activeSessionId ? [activeSessionId] : []}
-                items={menuItems}
-                onClick={({ key }) => setActiveSessionId(String(key))}
-                className="session-menu"
-              />
+              <div className="session-list">
+                {sessions.map((session) => (
+                  <div
+                    key={session.sessionId}
+                    className={`session-item ${activeSessionId === session.sessionId ? "active" : ""}`}
+                    onClick={() => setActiveSessionId(session.sessionId)}
+                  >
+                    <DatabaseOutlined className="session-icon" />
+                    <Tooltip title={session.title} mouseEnterDelay={0.5} placement="right">
+                      <span className="session-title">{session.title}</span>
+                    </Tooltip>
+                    <Button
+                      type="text"
+                      size="small"
+                      className="session-close-btn"
+                      icon={<DisconnectOutlined />}
+                      onClick={async (event) => {
+                        event.stopPropagation();
+                        await handleCloseSession(session.sessionId);
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
             </Card>
           </Sider>
         )}
