@@ -28,7 +28,15 @@
 
 ## 截图
 
-> 即将推出
+### 主界面
+
+| 浅色模式 | 深色模式 |
+|:--------:|:--------:|
+| ![浅色模式](docs/images/image-light.png) | ![深色模式](docs/images/image-dark.png) |
+
+### 主题设置
+
+![主题设置](docs/images/theme-set.png)
 
 ## 安装
 
