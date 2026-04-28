@@ -160,6 +160,9 @@ export const ConnectionManagerDialog = ({
             onChange: (keys) => setSelectedId(String(keys[0] ?? ""))
           }}
           onRow={(record) => ({
+            onClick: () => {
+              setSelectedId(record.id);
+            },
             onDoubleClick: async () => {
               setBusyId(record.id);
               try {
