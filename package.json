@@ -1,7 +1,7 @@
 {
   "name": "redix",
   "productName": "Redix",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Redix rebuilt with TypeScript and Electron",
   "main": "./out/main/main.js",
   "author": "caichenghu",
@@ -41,6 +41,9 @@
       "output": "dist"
     },
     "mac": {
+      "identity": "RedixSelfSigned",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
       "icon": "resources/icon.png",
       "target": [
         {
