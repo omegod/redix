@@ -41,7 +41,7 @@
       "output": "dist"
     },
     "mac": {
-      "identity": "RedixSelfSigned",
+      "identity": "RedixDevCert",
       "hardenedRuntime": false,
       "gatekeeperAssess": false,
       "icon": "resources/icon.png",
@@ -74,9 +74,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "installerIcon": "resources/icon.png",
-      "uninstallerIcon": "resources/icon.png"
+      "createDesktopShortcut": true
     }
   }
 }

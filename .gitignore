@@ -9,3 +9,5 @@ pnpm-debug.log*
 .opencode
 .vite
 out
+build.keychain*
+*.p12

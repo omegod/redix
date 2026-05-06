@@ -69,7 +69,13 @@ npm run package:mac    # macOS (arm64)
 npm run package:win    # Windows (x64)
 ```
 
-## 开发
+> **macOS 打包说明**：首次打包前需运行以下脚本生成自签名证书（每台机器只需执行一次）：
+> ```bash
+> bash scripts/setup-cert.sh
+> npm run package:mac
+> ```
+> 自签名证书不受 Apple 信任，打包的应用在其他 Mac 上首次打开时会提示"无法验证开发者"，
+> 右键点击应用 → **打开** 即可正常使用。](## 开发
 
 ```bash
 # 开发模式运行（支持热重载）
