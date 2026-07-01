@@ -20,7 +20,7 @@ import {
   Typography
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ConnectionProfile } from "../../../shared/types";
 
 const { Paragraph, Text } = Typography;
@@ -65,7 +65,6 @@ export const ConnectionManagerDialog = ({
   const { modal, message } = App.useApp();
   const [selectedId, setSelectedId] = useState<string>("");
   const [busyId, setBusyId] = useState<string>("");
-  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -73,16 +72,6 @@ export const ConnectionManagerDialog = ({
     }
     setSelectedId((current) => current || connections[0]?.id || "");
   }, [connections, open]);
-
-  const handleAfterOpenChange = (visible: boolean) => {
-    if (visible) {
-      const table = bodyRef.current?.querySelector<HTMLElement>(".ant-table-container");
-      if (table) {
-        table.setAttribute("tabindex", "-1");
-        table.focus();
-      }
-    }
-  };
 
   const columns: ColumnsType<ConnectionProfile> = useMemo(
     () => [
@@ -108,7 +97,7 @@ export const ConnectionManagerDialog = ({
       closable={true}
       maskClosable={true}
       width={680}
-      afterOpenChange={handleAfterOpenChange}
+      focusable={{ trap: false }}
       footer={[
         <Button key="create" icon={<PlusOutlined />} onClick={onCreate}>
           新增
@@ -154,7 +143,7 @@ export const ConnectionManagerDialog = ({
         </Button>
       ]}
     >
-      <div ref={bodyRef} className="modal-stack" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div className="modal-stack" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <Paragraph type="secondary">
           管理并打开 Redis 会话。
         </Paragraph>

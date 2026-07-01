@@ -37,6 +37,7 @@
   "build": {
     "appId": "com.redix.app",
     "productName": "Redix",
+    "npmRebuild": false,
     "directories": {
       "output": "dist"
     },

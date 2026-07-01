@@ -231,6 +231,11 @@ body {
   overflow: hidden;
 }
 
+.content-stack .ant-tabs-body {
+  height: 100%;
+  overflow: auto;
+}
+
 .sidebar-stack {
   display: flex;
   flex: 1;

@@ -53,39 +53,39 @@ git clone https://github.com/caichenghu/redix.git
 cd redix
 
 # 安装依赖
-npm install
+pnpm install
 
 # 启动开发服务器
-npm run dev
+pnpm dev
 
 # 构建生产版本
-npm run build
+pnpm run build
 
 # 预览生产构建
-npm run preview
+pnpm preview
 
 # 打包应用
-npm run package:mac    # macOS (arm64)
-npm run package:win    # Windows (x64)
+pnpm package:mac    # macOS (arm64)
+pnpm package:win    # Windows (x64)
 ```
 
 > **macOS 打包说明**：首次打包前需运行以下脚本生成自签名证书（每台机器只需执行一次）：
 > ```bash
 > bash scripts/setup-cert.sh
-> npm run package:mac
+> pnpm package:mac
 > ```
 > 自签名证书不受 Apple 信任，打包的应用在其他 Mac 上首次打开时会提示"无法验证开发者"，
 > 右键点击应用 → **打开** 即可正常使用。](## 开发
 
 ```bash
 # 开发模式运行（支持热重载）
-npm run dev
+pnpm dev
 
 # 类型检查
-npm run typecheck
+pnpm typecheck
 
 # 构建
-npm run build
+pnpm build
 ```
 
 ## 项目结构
