@@ -1,0 +1,29 @@
+.treeShell {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-panel);
+}
+
+.nodeWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.nodeTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: 0;
+  flex: 1;
+}

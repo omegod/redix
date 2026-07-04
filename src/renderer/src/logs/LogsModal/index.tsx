@@ -1,7 +1,7 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Space, Table, Tag, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import type { LogEntry } from "../../../shared/types";
+import type { LogEntry } from "@shared/types";
 
 const { Text } = Typography;
 
@@ -14,7 +14,7 @@ interface LogsModalProps {
 
 export const LogsModal = ({ open, logs, onClose, onClear }: LogsModalProps) => {
   const { message } = App.useApp();
-  
+
   const columns: ColumnsType<LogEntry> = [
     {
       title: "时间",
@@ -64,12 +64,12 @@ export const LogsModal = ({ open, logs, onClose, onClear }: LogsModalProps) => {
         </Button>
       ]}
     >
-      <Space direction="vertical" size={12} className="modal-stack" style={{ width: '100%' }}>
+      <Space direction="vertical" size={12} style={{ width: "100%" }}>
         <Text type="secondary">记录连接、扫描、键编辑和手工命令。</Text>
         <Table
           rowKey="id"
           size="small"
-          style={{minHeight: 410}}
+          style={{ minHeight: 410 }}
           scroll={{ y: 320 }}
           columns={columns}
           dataSource={logs}
@@ -80,3 +80,5 @@ export const LogsModal = ({ open, logs, onClose, onClear }: LogsModalProps) => {
     </Modal>
   );
 };
+
+export default LogsModal;

@@ -1,7 +1,9 @@
 import { DatabaseOutlined } from "@ant-design/icons";
 import { Card, Col, Collapse, Empty, Row, Space, Statistic, Typography } from "antd";
-import type { ServerInfoPayload } from "../../../shared/types";
-import type { SessionViewState } from "../ui-types";
+import type { ServerInfoPayload } from "@shared/types";
+import type { SessionViewState } from "@renderer/ui-types";
+import shared from "@renderer/styles/shared.module.less";
+import styles from "./index.module.less";
 
 const { Text } = Typography;
 
@@ -15,7 +17,7 @@ export const InfoTab = ({ state, info }: InfoTabProps) => {
   const entries = Object.entries(sections).filter(([, value]) => Object.keys(value).length > 0);
 
   return (
-    <div className="page-panel">
+    <div className={shared.pagePanel}>
       <Row gutter={[12, 12]}>
         <Col span={6}>
           <Card>
@@ -39,7 +41,7 @@ export const InfoTab = ({ state, info }: InfoTabProps) => {
         </Col>
       </Row>
 
-      <Card className="info-sections-card">
+      <Card className={`${shared.cardBase} ${styles.sectionsCard}`}>
         {entries.length === 0 ? (
           <Empty description="暂无服务器信息" />
         ) : (
@@ -68,3 +70,5 @@ export const InfoTab = ({ state, info }: InfoTabProps) => {
     </div>
   );
 };
+
+export default InfoTab;

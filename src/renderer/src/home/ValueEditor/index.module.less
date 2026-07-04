@@ -1,0 +1,25 @@
+.editorCard {
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  overflow: hidden;
+
+  :global(.ant-card-body) {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+}
+
+.textarea {
+  flex: 1;
+  resize: none !important;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  background: var(--bg-panel);
+  color: var(--text);
+}

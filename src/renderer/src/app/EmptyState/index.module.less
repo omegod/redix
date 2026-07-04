@@ -1,0 +1,65 @@
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background: var(--bg-layout);
+  border: none;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  mix-blend-mode: multiply;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+:global(html.dark) .logo {
+  mix-blend-mode: normal;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+}
+
+.shortcuts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shortcutItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shortcutLabel {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.shortcutKey {
+  font-size: 13px;
+  font-family: "JetBrains Mono", monospace;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--text);
+}
